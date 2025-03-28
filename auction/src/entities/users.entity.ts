@@ -16,7 +16,7 @@ export class Users {
   @Column('varchar', {comment:'핸드폰번호', length: 500, nullable: true })
   phone?: string;
 
-  @Column('varchar', {comment:'공인인증서'})
+  @Column('varchar', {comment:'공인인증서', nullable: true})
   certification?: string;
 
   @Column('varchar', {comment:'제공자', length: 100, nullable: true})

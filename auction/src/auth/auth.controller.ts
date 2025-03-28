@@ -7,7 +7,7 @@ export class AuthController {
 
     // 회원가입 API
     @Post('/signup')
-    async signUp(body: {email: string; password: string; name: string; phone: string}) {
+    async signUp(@Body() body: {email: string; password: string; name: string; phone: string}) {
         return this.authService.signUp(body.email, body.password, body.name, body.phone)
     }
 }
