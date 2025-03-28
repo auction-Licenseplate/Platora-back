@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 
-
 import { Users } from './entities/users.entity'
 import { UserCheck } from './entities/user_check';
 import { Vehicles } from './entities/vehicles';
