@@ -4,8 +4,19 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { Users } from './entities/users.entity'
 import { AuthModule } from './auth/auth.module';
+
+
+import { Users } from './entities/users.entity'
+import { UserCheck } from './entities/user_check';
+import { Vehicles } from './entities/vehicles';
+import { Grades } from './entities/grades';
+import { Auctions } from './entities/auctions';
+import { Bids } from './entities/bids';
+import { Payment } from './entities/payment';
+import { Favorites } from './entities/favorites';
+import { Admins } from './entities/admins';
+import { Notifications } from './entities/notifications';
 @Module({
   imports: [
     ConfigModule.forRoot({ // 환경변수 설정 (배포, 개발 구분)
@@ -20,7 +31,7 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [ Users ],
+      entities: [ Users, UserCheck, Vehicles, Grades, Auctions, Bids, Payment, Favorites, Admins, Notifications ],
       charset: 'utf8mb4',
       synchronize: process.env.NODE_ENV !== 'production', // 개발 환경에서만 true
     }),
