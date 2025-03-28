@@ -29,6 +29,8 @@
     "@types/bcrypt": "^5.0.2",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "env": "^0.0.2",
     "mysql2": "^3.14.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
