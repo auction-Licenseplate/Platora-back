@@ -19,6 +19,9 @@ export class Users {
   @Column('varchar', {comment:'공인인증서', nullable: true})
   certification?: string;
 
+  @Column('int', {comment:'포인트', nullable: true})
+  point?: number;
+
   @Column('varchar', {comment:'제공자', length: 100, nullable: true})
   proviedr?: string;
 

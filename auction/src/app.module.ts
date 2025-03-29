@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { PayModule } from './pay/pay.module';
 
 import { Users } from './entities/users.entity'
 import { UserCheck } from './entities/user_check';
@@ -35,7 +36,8 @@ import { Notifications } from './entities/notifications';
       synchronize: process.env.NODE_ENV !== 'production', // 개발 환경에서만 true
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+    PayModule
   ],
   controllers: [AppController],
   providers: [AppService],
