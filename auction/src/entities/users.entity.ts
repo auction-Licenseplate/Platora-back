@@ -23,7 +23,7 @@ export class Users {
   point?: number;
 
   @Column('varchar', {comment:'제공자', length: 100, nullable: true})
-  proviedr?: string;
+  provider?: string;
 
   @CreateDateColumn({ type: 'timestamp' }) 
   created_at: Date;

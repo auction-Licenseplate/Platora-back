@@ -51,7 +51,7 @@ export class AuthService {
         const payload = {id: user.id, email: user.email};
         return {
             message: '로그인 성공',
-            accessToken: this.jwtService.sign(payload),
+            token: this.jwtService.sign(payload),
         };
     }
 
