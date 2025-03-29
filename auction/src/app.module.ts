@@ -5,9 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { PayModule } from './pay/pay.module';
 
-
-import { Users } from './entities/users.entity'
+import { Users } from './entities/users.entity';
 import { UserCheck } from './entities/user_check';
 import { Vehicles } from './entities/vehicles';
 import { Grades } from './entities/grades';
@@ -53,6 +53,7 @@ import { Notifications } from './entities/notifications';
     }),
     UsersModule,
     AuthModule,
+    PayModule,
   ],
   controllers: [AppController],
   providers: [AppService],

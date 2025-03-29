@@ -16,6 +16,18 @@ export class Payment {
     @Column('varchar', {comment:'결제수단', nullable: true})
     payment_method: string;
 
+    @Column('varchar', {comment:'카드사 종류', nullable: true})
+    card_company: string;
+
+    @Column('varchar', {comment:'환불 계좌번호', nullable: true})
+    account: string;
+
+    @Column('int', {comment:'결제금액', nullable: true})
+    amount: number;
+
+    @Column('int', {comment:'환불금액', nullable: true})
+    refund_amount: number;
+
     @Column({ type: 'enum', enum: ['success', 'failed'], default: 'success' })
     status: string;
 }
