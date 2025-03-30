@@ -86,4 +86,30 @@ export class AuthService {
 
         return { accessToken, refreshToken };
     }
+
+
+    // 아이디 찾기
+    async findId(email:string, password:string){
+        const user = await this.userRepository.findOne({where: {email, password}});
+        if(!user){
+            return { message: '저장된 아이디 없음' };
+        }
+
+        return { userID: user.id };
+    }
+    // 비밀번호 찾기
+    async findPW(email:string, phone:string){
+        const user = await this.userRepository.findOne({where: {email, phone}});
+        if(!user){
+            return { message: '저장된 비밀번호 없음' };
+        }
+
+        const newPW = Math.random().toString(36).slice(-8); // 나중에 유효성검사 진행하기
+        user.password = await bcrypt.hash(newPW, 10);
+        await this.userRepository.save(user);
+
+        console.log(`임시 비밀번호: ${newPW}`);
+
+        return { newPW: newPW };
+    }
 }

@@ -41,4 +41,18 @@ export class AuthController {
             refreshToken: token.refreshToken
         }
     }
+
+
+    // 아이디 찾기
+    @Post('/findID')
+    async userID(@Body() body: {email: string; password: string}){
+        return await this.authService.findId(body.email, body.password)
+    }
+
+    // 비밀번호 찾기
+    @Post('/findpw')
+    async userPW(@Body() body){
+        const { email, phone } = body;
+        return await this.authService.findPW(email, phone);
+    }
 }
