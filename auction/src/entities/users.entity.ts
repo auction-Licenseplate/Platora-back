@@ -28,6 +28,9 @@ export class Users {
   @Column('varchar', {comment:'관리자', length: 100, nullable: true})
   role?: string;
 
+  // @Column('varchar', { comment: 'Refresh 토큰', nullable: true })
+  // refreshToken?: string;
+
   @CreateDateColumn({ type: 'timestamp' }) 
   created_at: Date;
 

@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PayModule } from './pay/pay.module';
+import { VehiclesModule } from './vehicles/vehicles.module';
 
 import { Users } from './entities/users.entity';
 import { UserCheck } from './entities/user_check';
@@ -17,7 +18,6 @@ import { Payment } from './entities/payment';
 import { Favorites } from './entities/favorites';
 import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
-import { VehiclesModule } from './vehicles/vehicles.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
