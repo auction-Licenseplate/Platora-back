@@ -29,4 +29,17 @@ export class UsersService {
 
         return {provider: user?.provider || ''}
     }
+
+    // 공인인증서 db 저장
+    async saveFile(userId: number, filePath: string){
+        const user = await this.userRepository.findOne({where: { id: userId }})
+        if(!user) {
+            return { message: '유저정보 없음' };
+        }
+
+        user.certification = filePath;
+        await this.userRepository.save(user);
+        
+        return {message: '파일 업로드 성공'};
+    }
 }

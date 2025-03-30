@@ -30,4 +30,7 @@ export class Payment {
 
     @Column({ type: 'enum', enum: ['success', 'failed'], default: 'success' })
     status: string;
+
+    @Column({ type: 'enum', enum: ['success', 'failed'], default: 'success' })
+    refund_status: string;
 }

@@ -17,6 +17,7 @@ import { Payment } from './entities/payment';
 import { Favorites } from './entities/favorites';
 import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
+import { VehiclesModule } from './vehicles/vehicles.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ // 환경변수 설정 (배포, 개발 구분)
@@ -37,7 +38,8 @@ import { Notifications } from './entities/notifications';
     }),
     UsersModule,
     AuthModule,
-    PayModule
+    PayModule,
+    VehiclesModule
   ],
   controllers: [AppController],
   providers: [AppService],

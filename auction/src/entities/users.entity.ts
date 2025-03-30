@@ -25,6 +25,9 @@ export class Users {
   @Column('varchar', {comment:'제공자', length: 100, nullable: true})
   provider?: string;
 
+  @Column('varchar', {comment:'관리자', length: 100, nullable: true})
+  role?: string;
+
   @CreateDateColumn({ type: 'timestamp' }) 
   created_at: Date;
 

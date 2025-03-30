@@ -30,4 +30,14 @@ export class PayService {
         await this.payRepository.save(refund); // db에 저장
         return { message: '환불정보 저장 성공' };
     }
+
+    // 환불 성공여부 전달
+    async refundState(userId: number) {
+        const refundData = await this.payRepository.find({
+            where: {user: {id: userId}},
+            select: ['refund_amount', 'refund_status']
+        });
+
+        return refundData;
+    }
 }
