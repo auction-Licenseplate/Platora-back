@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -38,7 +38,7 @@ export class AuthService {
         // 유저 정보 확인
         const user = await this.userRepository.findOne({ where:{email}});
         if(!user) {
-            return { message: '200 유저정보 없음' };
+            throw new UnauthorizedException('200 유저 정보 없음.');
         }
 
         // 비밀번호 검증 (느낌표는 null일 가능성이 있는 것처럼 보이더라도 실제로 null이 아니라는 것을 알려줌)
@@ -49,10 +49,10 @@ export class AuthService {
 
         // 토큰 발급
         const payload = {id: user.id, email: user.email};
-        return {
-            message: '로그인 성공',
-            token: this.jwtService.sign(payload),
-        };
+        const token = this.jwtService.sign(payload);
+
+        // localstrategy에서 req.user로 데이터 넘김
+        return { id: user.id, email: user.email, token };
     }
 
     // 카카오 로그인
@@ -133,7 +133,7 @@ export class AuthService {
             return { message: '저장된 비밀번호 없음' };
         }
 
-        const newPW = Math.random().toString(36).slice(-8); // 나중에 유효성검사 진행하기
+        const newPW = Math.random().toString(36).slice(-8); // 삭제하기
         user.password = await bcrypt.hash(newPW, 10);
         await this.userRepository.save(user);
 

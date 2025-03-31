@@ -12,9 +12,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   // 함수명 validate로 작성해야하는 조건 있음
   async validate(email: string, password: string): Promise<any> {
     const user = await this.authService.localLogin(email, password);
-    if (!user) {
+    if (!user.token) {
       throw new UnauthorizedException('이메일 또는 비밀번호가 잘못됨.');
     }
-    return user; // Passport는 여기서 반환된 값을 req.user에 저장
+    return user;
   }
 }

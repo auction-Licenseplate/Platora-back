@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { access } from 'fs';
 
 @Controller('auth')
 export class AuthController {
@@ -16,73 +15,67 @@ export class AuthController {
     // 로컬 로그인 API
     @Post('/login')
     @UseGuards(AuthGuard('local'))
-    async login(@Req() req: any) {
-        return req.user; // LocalStrategy의 validate가 반환한 유저 정보
+    async login(@Req() req: any, @Res() res: any) {
+        const { id, email, token } = req.user;
+        if (!token) {
+            return { message: '로그인 실패' }; 
+        }
+
+        // 쿠키에 토큰 저장
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24, // 1일 유지
+        });
+  
+        // 로그인 성공 응답
+        return res.json({ message: '로그인 성공', id, email });
     }
     
     // 카카오 로그인 API
     @Get('kakao')
     @UseGuards(AuthGuard('kakao'))
     async kakaoLogin(@Req() req: Request){
-        // 카카오로그인 페이지로 자동 리다이렉트
-    }
-
-    @Get('kakao/callback')
-    @UseGuards(AuthGuard('kakao'))
-    async kakaoLoginCallback(@Req() req){
-        // 사용자 확인 후 토큰 발급
-        const user = await this.authService.kakaoUser(req.user.email);
-        const token = await this.authService.snsToken(user);
-
-        return {
-            message: "카카오 로그인 성공",
-            user,
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken
-        }
+        // 카카오 로그인 페이지로 자동 리다이렉트
     }
 
     // 네이버 로그인 API
     @Get('naver')
     @UseGuards(AuthGuard('naver'))
     async naverLogin(@Req() req: Request){
-        // 네이버로그인 페이지로 자동 리다이렉트
-    }
-
-    @Get('naver/callback')
-    @UseGuards(AuthGuard('naver'))
-    async naverLoginCallback(@Req() req){
-        // 사용자 확인 후 토큰 발급
-        const user = await this.authService.naverUser(req.user.email, req.user.name, req.user.phone);
-        const token = await this.authService.snsToken(user);
-
-        return {
-            message: "네이버 로그인 성공",
-            user,
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken
-        }
+        // 네이버 로그인 페이지로 자동 리다이렉트
     }
 
     // 구글 로그인 API
     @Get('google')
     @UseGuards(AuthGuard('google'))
-    async googleLogin(@Req() req: Request){
-        // 구글로그인 페이지로 자동 리다이렉트
+    async googleLogin(): Promise<void>{
+        // 구글 로그인 페이지로 자동 리다이렉트
     }
-    
-    @Get('google/callback')
-    @UseGuards(AuthGuard('google'))
-    async googleLoginCallback(@Req() req){
-        // 사용자 확인 후 토큰 발급
-        const user = await this.authService.googleUser(req.user.email);
+
+    // sns 로그인 타입 구별
+    @Post('login/:type')
+    async socialLogin(@Param('type') type: string, @Body() body:{code: string}){
+        let user;
+
+        if(type === 'kakao'){
+            user = await this.authService.kakaoUser(body.code);
+        } else if(type === 'naver') {
+            // user = await this.authService.naverUser(body.code);
+        } else if(type === 'google'){
+            user = await this.authService.googleUser(body.code);
+        }
+
+        if(!user) {
+            return {message: '200 소셜로그인 실패'};
+        }
+
         const token = await this.authService.snsToken(user);
 
         return {
-            message: "구글 로그인 성공",
+            message: `${type} 로그인 성공`,
             user,
             accessToken: token.accessToken,
-            refreshToken: token.refreshToken
+            refreshToken: token.refreshToken,
         }
     }
 
