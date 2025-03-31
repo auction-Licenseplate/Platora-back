@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-
+import { JwtAuthGuard } from './jwt.guard';
+import { Request, Response } from 'express';
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService){}
@@ -29,6 +30,22 @@ export class AuthController {
   
         // 로그인 성공 응답
         return res.json({ message: '로그인 성공', id, email });
+    }
+
+    // 쿠키에서 토큰 꺼내기
+    @Get('/tokenCheck')
+    @UseGuards(AuthGuard('jwt'))
+    async tokenCheck(@Req() req: Request) {
+        console.log("📌 tokenCheck 요청 도착!"); // ✅ 실행 확인
+        console.log("📌 요청된 쿠키:", req.cookies); // ✅ 쿠키 내용 확인
+        console.log("📌 인증된 유저 정보:", req.user); // ✅ 인증된 유저 정보 확인
+        
+        if (!req.cookies || !req.cookies.access_token) {
+            console.log("❌ 쿠키 없음! 401 반환");
+            throw new UnauthorizedException('쿠키가 없음');
+        }
+
+        return { message: "로그인 유지됨", token: req.user };    
     }
     
     // 카카오 로그인 API

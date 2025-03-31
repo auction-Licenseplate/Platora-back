@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/entities/users.entity';
 import axios from 'axios';
+import * as jwt from 'jsonwebtoken'; // JWT 라이브러리 사용
 
 @Injectable()
 export class AuthService {
@@ -50,26 +51,14 @@ export class AuthService {
 
         // 토큰 발급
         const payload = {id: user.id, email: user.email};
-        const token = this.jwtService.sign(payload);
+        const secretKey = process.env.JWT_SECRET || 'default_secret';
+        const token = jwt.sign(payload, secretKey, {
+            expiresIn: '1d', // 1일 동안 유효
+        });
 
         // localstrategy에서 req.user로 데이터 넘김
         return { id: user.id, email: user.email, token };
     }
-
-    // 카카오 로그인
-    // async kakaoUser(kakao_account: string) {
-    //     let user = await this.userRepository.findOne({ where: { email: kakao_account } });
-    
-    //     if (!user) { // 유저가 없으면 새로 생성
-    //         user = this.userRepository.create({
-    //             email: kakao_account,
-    //             provider: 'kakao',
-    //         });
-    //         await this.userRepository.save(user);
-    //     }
-    
-    //     return user;
-    // }
     
     async kakaoUser(code: string) {
         console.log("카카오 클라이언트 아이디:", process.env.KAKAO_CLIENT_ID);
@@ -178,7 +167,7 @@ export class AuthService {
             return { message: '저장된 아이디 없음' };
         }
 
-        return { userID: user.id };
+        return { email: user.id };
     }
     // 비밀번호 찾기
     async findPW(email:string, phone:string){

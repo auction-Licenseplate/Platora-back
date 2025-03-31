@@ -14,7 +14,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Users]),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -25,6 +25,6 @@ import { ConfigModule } from '@nestjs/config';
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, KakaoStrategy, NaverStrategy, GoogleStrategy],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

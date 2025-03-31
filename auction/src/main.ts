@@ -9,7 +9,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     origin: 'http://localhost:3000', // 프론트엔드 URL 허용
-    credentials: true,
+    credentials: true, // 쿠키 전송 허용
   });
   
   // 환경변수에서 포트 로드 (5000으로 수정)
