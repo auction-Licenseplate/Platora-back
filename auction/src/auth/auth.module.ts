@@ -8,6 +8,8 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { KakaoStrategy } from './strategies/kakao.strategy';
+import { NaverStrategy } from './strategies/naver.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Users]),
@@ -17,7 +19,7 @@ import { KakaoStrategy } from './strategies/kakao.strategy';
       signOptions: { expiresIn: '24h' },  // JWT 만료 시간 설정
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, KakaoStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, KakaoStrategy, NaverStrategy, GoogleStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })
