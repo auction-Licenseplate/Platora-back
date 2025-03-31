@@ -55,7 +55,7 @@ export class AuthService {
         };
     }
 
-    // 카카오 유저 확인
+    // 카카오 로그인
     async kakaoUser(kakao_account: string) {
         let user = await this.userRepository.findOne({ where: { email: kakao_account } });
     
@@ -70,8 +70,38 @@ export class AuthService {
         return user;
     }
 
-    // 카카오 JWT 토큰 발급
-    async kakaoToken(user: any){
+    // 네이버 로그인
+    async naverUser(naver_account: string, name: string, phone: string){
+        let user = await this.userRepository.findOne({ where: { email: naver_account } });
+        if (!user) { // 유저가 없으면 새로 생성
+            user = this.userRepository.create({
+                email: naver_account,
+                name,
+                phone,
+                provider: 'naver',
+            });
+            await this.userRepository.save(user);
+        }
+        return user;
+    }
+
+    // 구글 로그인
+    async googleUser(google_account: string){
+        let user = await this.userRepository.findOne({ where: { email: google_account } });
+    
+        if (!user) { // 유저가 없으면 새로 생성
+            user = this.userRepository.create({
+                email: google_account,
+                provider: 'google',
+            });
+            await this.userRepository.save(user);
+        }
+
+        return user;
+    }
+
+    // sns JWT 토큰 발급
+    async snsToken(user: any){
         const payload = { 
             id: user.id,
             email: user.email, 
@@ -86,7 +116,6 @@ export class AuthService {
 
         return { accessToken, refreshToken };
     }
-
 
     // 아이디 찾기
     async findId(email:string, password:string){

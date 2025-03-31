@@ -32,7 +32,7 @@ export class AuthController {
     async kakaoLoginCallback(@Req() req){
         // 사용자 확인 후 토큰 발급
         const user = await this.authService.kakaoUser(req.user.email);
-        const token = await this.authService.kakaoToken(user);
+        const token = await this.authService.snsToken(user);
 
         return {
             message: "카카오 로그인 성공",
@@ -42,6 +42,49 @@ export class AuthController {
         }
     }
 
+    // 네이버 로그인 API
+    @Get('naver')
+    @UseGuards(AuthGuard('naver'))
+    async naverLogin(@Req() req: Request){
+        // 네이버로그인 페이지로 자동 리다이렉트
+    }
+
+    @Get('naver/callback')
+    @UseGuards(AuthGuard('naver'))
+    async naverLoginCallback(@Req() req){
+        // 사용자 확인 후 토큰 발급
+        const user = await this.authService.naverUser(req.user.email, req.user.name, req.user.phone);
+        const token = await this.authService.snsToken(user);
+
+        return {
+            message: "네이버 로그인 성공",
+            user,
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken
+        }
+    }
+
+    // 구글 로그인 API
+    @Get('google')
+    @UseGuards(AuthGuard('google'))
+    async googleLogin(@Req() req: Request){
+        // 구글로그인 페이지로 자동 리다이렉트
+    }
+    
+    @Get('google/callback')
+    @UseGuards(AuthGuard('google'))
+    async googleLoginCallback(@Req() req){
+        // 사용자 확인 후 토큰 발급
+        const user = await this.authService.googleUser(req.user.email);
+        const token = await this.authService.snsToken(user);
+
+        return {
+            message: "구글 로그인 성공",
+            user,
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken
+        }
+    }
 
     // 아이디 찾기
     @Post('/findID')
