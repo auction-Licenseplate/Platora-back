@@ -9,21 +9,9 @@ export class AuthController {
   // 회원가입 API
   @Post('/signup')
   async signUp(
-    @Body()
-    body: {
-      email: string;
-      password: string;
-      name: string;
-      phone: string;
-    },
-  ) {
-    return this.authService.signUp(
-      body.email,
-      body.password,
-      body.name,
-      body.phone,
-    );
-  }
+    @Body() body: { email: string; password: string; name: string; phone: string;}) {
+      return this.authService.signUp( body.email, body.password, body.name, body.phone);
+    }
 
   // 로컬 로그인 API
   @Post('/login')
@@ -33,15 +21,14 @@ export class AuthController {
     if (!token) {
       return { message: '로그인 실패' };
     }
+    // 쿠키에 토큰 저장
+    res.cookie('accessToken', token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24, // 1일 유지
+    });
 
-        // 쿠키에 토큰 저장
-        res.cookie('accessToken', token, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24, // 1일 유지
-        });
-  
-        // 로그인 성공 응답
-        return res.json({ message: '로그인 성공', id, email });
+    // 로그인 성공 응답
+    return res.json({ message: '로그인 성공', id, email });
     }
 
     // 쿠키에서 토큰 꺼내기
@@ -125,5 +112,11 @@ export class AuthController {
   async userPW(@Body() body) {
     const { email, phone } = body;
     return await this.authService.findPW(email, phone);
+  }
+
+  // 새 비밀번호 저장
+  @Post('/pwfind/updatepw')
+  async pwFinde(@Body() body: { password: string; userID: number }) {
+    return this.authService.updatePW(body.userID, body.password);
   }
 }

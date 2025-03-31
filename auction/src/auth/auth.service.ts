@@ -248,13 +248,13 @@ export class AuthService {
   }
 
     // 아이디 찾기
-    async findId(email:string, password:string){
-        const user = await this.userRepository.findOne({where: {email, password}});
+    async findId(name:string, phone:string){
+        const user = await this.userRepository.findOne({where: {name, phone}});
         if(!user){
             return { message: '저장된 아이디 없음' };
         }
 
-        return { email: user.id };
+        return { email: user.email };
     }
     // 비밀번호 찾기
     async findPW(email:string, phone:string){
@@ -263,6 +263,20 @@ export class AuthService {
             return { message: '저장된 비밀번호 없음' };
         }
 
-    return { userID: user.id };
-  }
+        return { userID: user.id };
+    }
+
+    // 새 비밀번호 업데이트
+    async updatePW(userID: number, newPassword: string){
+        const user = await this.userRepository.findOne({ where: { id: userID } });
+        if (!user) {
+            return { message: '사용자 없음' };
+        }
+
+        const hashPW = await bcrypt.hash(newPassword, 10); // 비밀번호 암호화
+        user.password = hashPW;
+        await this.userRepository.save(user);
+
+        return { message: '새 비밀번호 저장 성공' };
+    }
 }
