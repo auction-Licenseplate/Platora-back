@@ -10,10 +10,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Users]),
     PassportModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecret',  // JWT 비밀 키 설정
       signOptions: { expiresIn: '24h' },  // JWT 만료 시간 설정

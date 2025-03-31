@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/entities/users.entity';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -56,16 +57,69 @@ export class AuthService {
     }
 
     // 카카오 로그인
-    async kakaoUser(kakao_account: string) {
-        let user = await this.userRepository.findOne({ where: { email: kakao_account } });
+    // async kakaoUser(kakao_account: string) {
+    //     let user = await this.userRepository.findOne({ where: { email: kakao_account } });
     
-        if (!user) { // 유저가 없으면 새로 생성
+    //     if (!user) { // 유저가 없으면 새로 생성
+    //         user = this.userRepository.create({
+    //             email: kakao_account,
+    //             provider: 'kakao',
+    //         });
+    //         await this.userRepository.save(user);
+    //     }
+    
+    //     return user;
+    // }
+    
+    async kakaoUser(code: string) {
+        console.log("카카오 클라이언트 아이디:", process.env.KAKAO_CLIENT_ID);
+        console.log("카카오 콜백 주소:", process.env.KAKAO_REDIRECT_URL);
+
+        const KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
+        const KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
+    
+        // 1. 인가 코드로 카카오에서 액세스 토큰 받아오기
+        const tokenResponse = await axios.post(KAKAO_TOKEN_URL, null, {
+            params: {
+                // grant_type: "authorization_code",
+                client_id: process.env.KAKAO_CLIENT_ID,
+                client_secret: process.env.KAKAO_CLIENT_SECRET,
+                redirect_uri: process.env.KAKAO_REDIRECT_URL,
+                code: code,
+            },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        }).catch(error => {
+            console.error("카카오 토큰 요청 실패:", error.response?.data || error.message);
+        });
+    
+        const accessToken = tokenResponse?.data.access_token;
+    
+        // 2. 액세스 토큰으로 사용자 정보 받아오기
+        const userResponse = await axios.get(KAKAO_USER_INFO_URL, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        }).catch(error => {
+            console.error("카카오 사용자 정보 요청 실패:", error.response?.data || error.message);
+        });
+    
+        const kakaoAccount = userResponse?.data.kakao_account;
+    
+        let user = await this.userRepository.findOne({
+            where: { email: kakaoAccount.email },
+        });
+    
+        if (!user) {
             user = this.userRepository.create({
-                email: kakao_account,
-                provider: 'kakao',
+                email: kakaoAccount.email,
+                provider: "kakao",
             });
             await this.userRepository.save(user);
         }
+        console.log("카카오 사용자 정보:", userResponse?.data);
     
         return user;
     }
@@ -133,12 +187,6 @@ export class AuthService {
             return { message: '저장된 비밀번호 없음' };
         }
 
-        const newPW = Math.random().toString(36).slice(-8); // 삭제하기
-        user.password = await bcrypt.hash(newPW, 10);
-        await this.userRepository.save(user);
-
-        console.log(`임시 비밀번호: ${newPW}`);
-
-        return { newPW: newPW };
+        return { userID: user.id };
     }
 }
