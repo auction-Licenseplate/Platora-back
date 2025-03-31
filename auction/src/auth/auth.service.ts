@@ -5,8 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/entities/users.entity';
 import axios from 'axios';
-import * as jwt from 'jsonwebtoken'; // JWT 라이브러리 사용
-
+import * as jwt from 'jsonwebtoken';
 @Injectable()
 export class AuthService {
   constructor(
@@ -62,104 +61,167 @@ export class AuthService {
         return { id: user.id, email: user.email, token };
     }
     
+    // 카카오 로그인
     async kakaoUser(code: string) {
-        console.log("카카오 클라이언트 아이디:", process.env.KAKAO_CLIENT_ID);
-        console.log("카카오 콜백 주소:", process.env.KAKAO_REDIRECT_URL);
+        console.log("카카오 로그인 받은 코드:", code);
 
-    const KAKAO_TOKEN_URL = 'https://kauth.kakao.com/oauth/token';
-    const KAKAO_USER_INFO_URL = 'https://kapi.kakao.com/v2/user/me';
+        const KAKAO_TOKEN_URL = 'https://kauth.kakao.com/oauth/token';
+        const KAKAO_USER_INFO_URL = 'https://kapi.kakao.com/v2/user/me';
 
-    // 1. 인가 코드로 카카오에서 액세스 토큰 받아오기
-    const tokenResponse = await axios
-      .post(KAKAO_TOKEN_URL, null, {
+        // 1. 코드로 카카오에서 액세스 토큰 받아오기
+        const tokenResponse = await axios
+        .post(KAKAO_TOKEN_URL, null, {
+            params: {
+                grant_type: "authorization_code",
+                client_id: process.env.KAKAO_CLIENT_ID,
+                client_secret: process.env.KAKAO_CLIENT_SECRET,
+                redirect_uri: process.env.KAKAO_REDIRECT_URL,
+                code: code,
+            },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })
+        .catch((error) => {
+            console.error('카카오 토큰 요청 실패:', error.response?.data);
+        });
+
+        const accessToken = tokenResponse?.data.access_token;
+
+        // 2. 액세스 토큰으로 사용자 정보 받아오기
+        const userResponse = await axios
+        .get(KAKAO_USER_INFO_URL, {
+            headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })
+        .catch((error) => {
+            console.error(
+            '카카오 사용자 정보 요청 실패:',
+            error.response?.data || error.message,
+            );
+        });
+
+        const kakaoAccount = userResponse?.data.kakao_account;
+
+        let user = await this.userRepository.findOne({
+            where: { email: kakaoAccount.email },
+        });
+
+        if (!user) {
+            user = this.userRepository.create({
+                email: kakaoAccount.email,
+                provider: 'kakao',
+            });
+            await this.userRepository.save(user);
+        }
+        console.log('카카오 사용자 정보:', userResponse?.data);
+
+        return user;
+    }
+
+  // 네이버 로그인
+  async naverUser(code: string) {
+    console.log("네이버 로그인 받은 코드:", code);
+
+    const NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
+    const NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+
+    const tokenResponse = await axios.post(NAVER_TOKEN_URL, null, {
         params: {
-          // grant_type: "authorization_code",
-          client_id: process.env.KAKAO_CLIENT_ID,
-          client_secret: process.env.KAKAO_CLIENT_SECRET,
-          redirect_uri: process.env.KAKAO_REDIRECT_URL,
-          code: code,
+            client_id: process.env.NAVER_CLIENT_ID,
+            client_secret: process.env.NAVER_CLIENT_SECRET,
+            redirect_uri: process.env.NAVER_REDIRECT_URL,
+            grant_type: "authorization_code",
+            code: code,
         },
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
         },
-      })
-      .catch((error) => {
-        console.error(
-          '카카오 토큰 요청 실패:',
-          error.response?.data || error.message,
-        );
-      });
+    }).catch(error => {
+        console.error("네이버 토큰 요청 실패:", error.response?.data);
+    });
 
     const accessToken = tokenResponse?.data.access_token;
 
-    // 2. 액세스 토큰으로 사용자 정보 받아오기
-    const userResponse = await axios
-      .get(KAKAO_USER_INFO_URL, {
+    const userResponse = await axios.get(NAVER_USER_INFO_URL, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Bearer ${accessToken}`,
         },
-      })
-      .catch((error) => {
-        console.error(
-          '카카오 사용자 정보 요청 실패:',
-          error.response?.data || error.message,
-        );
-      });
+    }).catch(error => {
+        console.error("네이버 사용자 정보 요청 실패:", error.response?.data);
+    });
 
-    const kakaoAccount = userResponse?.data.kakao_account;
+    const naverAccount = userResponse?.data.response;
+    console.log("네이버 사용자 정보:", naverAccount);
 
     let user = await this.userRepository.findOne({
-      where: { email: kakaoAccount.email },
+        where: { email: naverAccount.email },
     });
 
     if (!user) {
-      user = this.userRepository.create({
-        email: kakaoAccount.email,
-        provider: 'kakao',
-      });
-      await this.userRepository.save(user);
-    }
-    console.log('카카오 사용자 정보:', userResponse?.data);
-
-    return user;
-  }
-
-  // 네이버 로그인
-  async naverUser(naver_account: string, name: string, phone: string) {
-    let user = await this.userRepository.findOne({
-      where: { email: naver_account },
-    });
-    if (!user) {
-      // 유저가 없으면 새로 생성
-      user = this.userRepository.create({
-        email: naver_account,
-        name,
-        phone,
-        provider: 'naver',
-      });
-      await this.userRepository.save(user);
-    }
-    return user;
-  }
-
-  // 구글 로그인
-  async googleUser(google_account: string) {
-    let user = await this.userRepository.findOne({
-      where: { email: google_account },
-    });
-
-    if (!user) {
-      // 유저가 없으면 새로 생성
-      user = this.userRepository.create({
-        email: google_account,
-        provider: 'google',
-      });
-      await this.userRepository.save(user);
+        user = this.userRepository.create({
+            email: naverAccount.email,
+            name: naverAccount.name ?? "네이버 사용자",
+            phone: naverAccount.mobile ?? "000-0000-0000",
+            provider: "naver",
+        });
+        await this.userRepository.save(user);
     }
 
     return user;
-  }
+}
+
+    // 구글 로그인
+    async googleUser(code: string) {
+        console.log("구글 로그인 요청, 받은 코드:", code);
+    
+        const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+        const GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
+    
+        const tokenResponse = await axios.post(GOOGLE_TOKEN_URL, null, {
+            params: {
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                redirect_uri: process.env.GOOGLE_REDIRECT_URL,
+                grant_type: "authorization_code",
+                code: code,
+            },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        }).catch(error => {
+            console.error("구글 토큰 요청 실패:", error.response?.data);
+        });
+    
+        const accessToken = tokenResponse?.data.access_token;
+    
+        const userResponse = await axios.get(GOOGLE_USER_INFO_URL, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        }).catch(error => {
+            console.error("구글 사용자 정보 요청 실패:", error.response?.data);
+        });
+    
+        const googleAccount = userResponse?.data;
+        console.log("구글 사용자 정보:", googleAccount);
+    
+        let user = await this.userRepository.findOne({
+            where: { email: googleAccount.email },
+        });
+    
+        if (!user) {
+            user = this.userRepository.create({
+                email: googleAccount.email,
+                provider: "google",
+            });
+            await this.userRepository.save(user);
+        }
+    
+        return user;
+    }
 
   // sns JWT 토큰 발급
   async snsToken(user: any) {

@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from './jwt.guard';
 import { Request, Response } from 'express';
 @Controller('auth')
 export class AuthController {
@@ -36,7 +35,7 @@ export class AuthController {
     }
 
         // 쿠키에 토큰 저장
-        res.cookie('access_token', token, {
+        res.cookie('accessToken', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24, // 1일 유지
         });
@@ -49,15 +48,9 @@ export class AuthController {
     @Get('/tokenCheck')
     @UseGuards(AuthGuard('jwt'))
     async tokenCheck(@Req() req: Request) {
-        console.log("📌 tokenCheck 요청 도착!"); // ✅ 실행 확인
-        console.log("📌 요청된 쿠키:", req.cookies); // ✅ 쿠키 내용 확인
-        console.log("📌 인증된 유저 정보:", req.user); // ✅ 인증된 유저 정보 확인
-        
         if (!req.cookies || !req.cookies.access_token) {
-            console.log("❌ 쿠키 없음! 401 반환");
             throw new UnauthorizedException('쿠키가 없음');
         }
-
         return { message: "로그인 유지됨", token: req.user };    
     }
     
@@ -84,26 +77,18 @@ export class AuthController {
 
   // sns 로그인 타입 구별
   @Post('login/:type')
-  async socialLogin(
-    @Param('type') type: string,
-    @Body() body: { code: string },
-  ) {
+  async socialLogin(@Param('type') type: string, @Res() res: Response ,@Body() body: { code: string }) {
     console.log(`프론트에서 받은타입 ${type}`);
     console.log(`프론트에서 받은코드 ${body.code}`);
     let user;
 
     if (type === 'kakao') {
-      console.log('카카오 호출됨');
       user = await this.authService.kakaoUser(body.code);
     }
-
     if (type === 'naver') {
-      console.log('네이버 호출됨');
-      // user = await this.authService.naverUser(body.code);
+      user = await this.authService.naverUser(body.code);
     }
-
     if (type === 'google') {
-      console.log('구글 호출됨');
       user = await this.authService.googleUser(body.code);
     }
 
@@ -111,14 +96,21 @@ export class AuthController {
       return { message: '200 소셜로그인 실패' };
     }
 
+    // jwt 토큰 발급
     const token = await this.authService.snsToken(user);
 
-    return {
-      message: `${type} 로그인 성공`,
-      user,
-      accessToken: token.accessToken,
-      refreshToken: token.refreshToken,
-    };
+    // 쿠키에 저장
+    res.cookie('accessToken', token.accessToken, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 1000, // 1시간
+    });
+
+    res.cookie('refreshToken', token.refreshToken, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+    });
+
+    return res.json({ message: '로그인 성공' });
   }
 
   // 아이디 찾기
