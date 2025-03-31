@@ -230,8 +230,15 @@ export class AuthService {
       email: user.email,
       provider: user.provider,
     };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '1h',
+    });
+    
+    const refreshToken = this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '7d',
+    });
 
     // refresh 토큰 db 저장?
     // user.refreshToken = refreshToken;

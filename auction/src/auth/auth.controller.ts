@@ -48,7 +48,8 @@ export class AuthController {
     @Get('/tokenCheck')
     @UseGuards(AuthGuard('jwt'))
     async tokenCheck(@Req() req: Request) {
-        if (!req.cookies || !req.cookies.access_token) {
+        // console.log("req.user 정보:", req.user);
+        if (!req.cookies || !req.cookies.accessToken) {
             throw new UnauthorizedException('쿠키가 없음');
         }
         return { message: "로그인 유지됨", token: req.user };    
@@ -78,8 +79,8 @@ export class AuthController {
   // sns 로그인 타입 구별
   @Post('login/:type')
   async socialLogin(@Param('type') type: string, @Res() res: Response ,@Body() body: { code: string }) {
-    console.log(`프론트에서 받은타입 ${type}`);
-    console.log(`프론트에서 받은코드 ${body.code}`);
+    // console.log(`프론트에서 받은타입 ${type}`);
+    // console.log(`프론트에서 받은코드 ${body.code}`);
     let user;
 
     if (type === 'kakao') {
