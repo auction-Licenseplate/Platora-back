@@ -304,4 +304,12 @@ export class AuthService {
 
     return { message: '소셜로그인 추가정보 저장 성공' };
   }
+
+  // 이메일, 번호 중복검사
+  async duplicateCheck(type: string, valueToCheck: string){
+    const condition = type === 'email' ? { email: valueToCheck } : { phone: valueToCheck };
+    const user = await this.userRepository.findOne({ where: condition });
+
+    return {message: user ? '중복됨' : '사용 가능', type};
+  }
 }
