@@ -172,6 +172,7 @@ export class AuthService {
         provider: 'naver',
       });
       await this.userRepository.save(user);
+      return { message: '가입되지 않은 유저' };
     }
 
     return user;
@@ -227,8 +228,12 @@ export class AuthService {
         provider: 'google',
       });
       await this.userRepository.save(user);
+<<<<<<< HEAD
       console.log(googleAccount.email);
       return { email: googleAccount.email };
+=======
+      return { message: '가입되지 않은 유저' };
+>>>>>>> 0cfa482b7f1650d6e4dd8e3f8558609364b8f26d
     }
 
     return user;
@@ -250,11 +255,7 @@ export class AuthService {
       secret: process.env.JWT_SECRET,
       expiresIn: '7d',
     });
-
-    // refresh 토큰 db 저장?
-    // user.refreshToken = refreshToken;
-    // await this.userRepository.save(user);
-
+    
     return { accessToken, refreshToken };
   }
 
