@@ -31,6 +31,7 @@ export class UsersService {
 
     // 공인인증서 db 저장
     async saveFile(userId: number, filePath: string){
+        console.log('파일 경로:', filePath);  // filePath 확인
         const user = await this.userRepository.findOne({where: { id: userId }})
         if(!user) {
             return { message: '유저정보 없음' };

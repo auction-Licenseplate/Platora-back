@@ -8,7 +8,7 @@ export class PayController {
         private readonly payService: PayService
     ) {}
 
-    // 환불 정보 저장
+    // 환불할 포인트
     @UseGuards(JwtAuthGuard)
     @Post('/refund-point')
     async refundPoint(@Req() req, @Body() body){

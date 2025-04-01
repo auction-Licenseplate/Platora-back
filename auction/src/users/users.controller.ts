@@ -23,6 +23,7 @@ export class UsersController {
         return await this.userService.getUserInfo(user.id);
     };
 
+    // 비밀번호 변경 가능 여부 확인
     @Get('/passCheck')
     @UseGuards(JwtAuthGuard)
     async passwordCheck(@Req() req) {
@@ -31,22 +32,34 @@ export class UsersController {
         return await this.userService.passChange(user.id);
     }
 
+    // 공인인증서 저장
     @Post('/upload')
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {
-                cb(null, join(__dirname, '../../uploads'));
+                const uploadPath = join(__dirname, '../../uploads');
+                console.log('업로드 경로:', uploadPath); // 경로 확인
+                cb(null, uploadPath); // 파일 저장 경로
+                // cb(null, join(__dirname, '../../uploads'));
             },
             filename: (req, file, cb) => {
-                cb(null, `${Date.now()}_${file.originalname}`);
+                const filename = `${Date.now()}_${file.originalname}`;
+                console.log('저장될 파일 이름:', filename); // 파일 이름 확인
+                cb(null, filename);
+                // cb(null, `${Date.now()}_${file.originalname}`);
             },
         }),
     }))
     async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req){
-        console.log(file);
+        console.log('업로드된 파일:', file);  // 업로드된 파일 정보 확인
+        if (!file) {
+            return { message: '파일이 없습니다' };
+        }
+
         // 파일 처리 로직
         const userId = req.user.id;
+        console.log('유저 ID:', userId);  // 유저 ID 확인
         return await this.userService.saveFile(userId, file.filename);
     }
 }
