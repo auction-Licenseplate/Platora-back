@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/entities/users.entity';
 import axios from 'axios';
-import * as jwt from 'jsonwebtoken';
 @Injectable()
 export class AuthService {
   constructor(
@@ -53,12 +52,12 @@ export class AuthService {
     // 토큰 발급
     const payload = { id: user.id, email: user.email };
     const secretKey = process.env.JWT_SECRET || 'default_secret';
-    const token = jwt.sign(payload, secretKey, {
-      expiresIn: '1d', // 1일 동안 유효
+    const newToken = this.jwtService.sign(payload, {
+      secret: secretKey,
+      expiresIn: '1d',
     });
-
-    // localstrategy에서 req.user로 데이터 넘김
-    return { id: user.id, email: user.email, token };
+    // console.log("새로 발급된 토큰:", newToken);
+    return { id: user.id, email: user.email, token: newToken };
   }
 
   // 카카오 로그인
@@ -172,7 +171,8 @@ export class AuthService {
         provider: 'naver',
       });
       await this.userRepository.save(user);
-      return { message: '가입되지 않은 유저' };
+      console.log(user.id, '정신차려두번째네이버');
+      return user.id;
     }
 
     return user;
@@ -228,12 +228,9 @@ export class AuthService {
         provider: 'google',
       });
       await this.userRepository.save(user);
-<<<<<<< HEAD
       console.log(googleAccount.email);
-      return { email: googleAccount.email };
-=======
-      return { message: '가입되지 않은 유저' };
->>>>>>> 0cfa482b7f1650d6e4dd8e3f8558609364b8f26d
+      console.log(user.id, '정신차려라세번째구글자식아');
+      return user.id;
     }
 
     return user;
@@ -299,13 +296,11 @@ export class AuthService {
       return { message: '사용자 없음' };
     }
 
-    const plusinfo = await this.userRepository.create({
-      name: name,
-      phone: phone,
-    });
+    user.name = name;
+    user.phone = phone;
 
-    console.log('사용자정보어떠냐', plusinfo);
-    await this.userRepository.save(plusinfo);
+    console.log('사용자정보어떠냐', user);
+    await this.userRepository.save(user);
 
     return { message: '소셜로그인 추가정보 저장 성공' };
   }
