@@ -50,178 +50,188 @@ export class AuthService {
       return { message: '200 비밀번호 불일치함' };
     }
 
-        // 토큰 발급
-        const payload = {id: user.id, email: user.email};
-        const secretKey = process.env.JWT_SECRET || 'default_secret';
-        const token = jwt.sign(payload, secretKey, {
-            expiresIn: '1d', // 1일 동안 유효
-        });
+    // 토큰 발급
+    const payload = { id: user.id, email: user.email };
+    const secretKey = process.env.JWT_SECRET || 'default_secret';
+    const token = jwt.sign(payload, secretKey, {
+      expiresIn: '1d', // 1일 동안 유효
+    });
 
-        // localstrategy에서 req.user로 데이터 넘김
-        return { id: user.id, email: user.email, token };
-    }
-    
-    // 카카오 로그인
-    async kakaoUser(code: string) {
-        console.log("카카오 로그인 받은 코드:", code);
+    // localstrategy에서 req.user로 데이터 넘김
+    return { id: user.id, email: user.email, token };
+  }
 
-        const KAKAO_TOKEN_URL = 'https://kauth.kakao.com/oauth/token';
-        const KAKAO_USER_INFO_URL = 'https://kapi.kakao.com/v2/user/me';
+  // 카카오 로그인
+  async kakaoUser(code: string) {
+    console.log('카카오 로그인 받은 코드:', code);
 
-        // 1. 코드로 카카오에서 액세스 토큰 받아오기
-        const tokenResponse = await axios
-        .post(KAKAO_TOKEN_URL, null, {
-            params: {
-                grant_type: "authorization_code",
-                client_id: process.env.KAKAO_CLIENT_ID,
-                client_secret: process.env.KAKAO_CLIENT_SECRET,
-                redirect_uri: process.env.KAKAO_REDIRECT_URL,
-                code: code,
-            },
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        })
-        .catch((error) => {
-            console.error('카카오 토큰 요청 실패:', error.response?.data);
-        });
+    const KAKAO_TOKEN_URL = 'https://kauth.kakao.com/oauth/token';
+    const KAKAO_USER_INFO_URL = 'https://kapi.kakao.com/v2/user/me';
 
-        const accessToken = tokenResponse?.data.access_token;
-
-        // 2. 액세스 토큰으로 사용자 정보 받아오기
-        const userResponse = await axios
-        .get(KAKAO_USER_INFO_URL, {
-            headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        })
-        .catch((error) => {
-            console.error(
-            '카카오 사용자 정보 요청 실패:',
-            error.response?.data || error.message,
-            );
-        });
-
-        const kakaoAccount = userResponse?.data.kakao_account;
-
-        let user = await this.userRepository.findOne({
-            where: { email: kakaoAccount.email },
-        });
-
-        if (!user) {
-            user = this.userRepository.create({
-                email: kakaoAccount.email,
-                provider: 'kakao',
-            });
-            await this.userRepository.save(user);
-        }
-        console.log('카카오 사용자 정보:', userResponse?.data);
-
-        return user;
-    }
-
-  // 네이버 로그인
-  async naverUser(code: string) {
-    console.log("네이버 로그인 받은 코드:", code);
-
-    const NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
-    const NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
-
-    const tokenResponse = await axios.post(NAVER_TOKEN_URL, null, {
+    // 1. 코드로 카카오에서 액세스 토큰 받아오기
+    const tokenResponse = await axios
+      .post(KAKAO_TOKEN_URL, null, {
         params: {
-            client_id: process.env.NAVER_CLIENT_ID,
-            client_secret: process.env.NAVER_CLIENT_SECRET,
-            redirect_uri: process.env.NAVER_REDIRECT_URL,
-            grant_type: "authorization_code",
-            code: code,
+          grant_type: 'authorization_code',
+          client_id: process.env.KAKAO_CLIENT_ID,
+          client_secret: process.env.KAKAO_CLIENT_SECRET,
+          redirect_uri: process.env.KAKAO_REDIRECT_URL,
+          code: code,
         },
         headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-    }).catch(error => {
-        console.error("네이버 토큰 요청 실패:", error.response?.data);
-    });
+      })
+      .catch((error) => {
+        console.error('카카오 토큰 요청 실패:', error.response?.data);
+      });
 
     const accessToken = tokenResponse?.data.access_token;
 
-    const userResponse = await axios.get(NAVER_USER_INFO_URL, {
+    // 2. 액세스 토큰으로 사용자 정보 받아오기
+    const userResponse = await axios
+      .get(KAKAO_USER_INFO_URL, {
         headers: {
-            Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-    }).catch(error => {
-        console.error("네이버 사용자 정보 요청 실패:", error.response?.data);
-    });
+      })
+      .catch((error) => {
+        console.error(
+          '카카오 사용자 정보 요청 실패:',
+          error.response?.data || error.message,
+        );
+      });
 
-    const naverAccount = userResponse?.data.response;
-    console.log("네이버 사용자 정보:", naverAccount);
+    const kakaoAccount = userResponse?.data.kakao_account;
 
     let user = await this.userRepository.findOne({
-        where: { email: naverAccount.email },
+      where: { email: kakaoAccount.email },
     });
 
     if (!user) {
-        user = this.userRepository.create({
-            email: naverAccount.email,
-            name: naverAccount.name ?? "네이버 사용자",
-            phone: naverAccount.mobile ?? "000-0000-0000",
-            provider: "naver",
-        });
-        await this.userRepository.save(user);
+      user = this.userRepository.create({
+        email: kakaoAccount.email,
+        provider: 'kakao',
+      });
+      await this.userRepository.save(user);
+      return { message: '가입되지 않은 유저', user };
+    }
+    console.log('카카오 사용자 정보:', userResponse?.data);
+
+    return user;
+  }
+
+  // 네이버 로그인
+  async naverUser(code: string) {
+    console.log('네이버 로그인 받은 코드:', code);
+
+    const NAVER_TOKEN_URL = 'https://nid.naver.com/oauth2.0/token';
+    const NAVER_USER_INFO_URL = 'https://openapi.naver.com/v1/nid/me';
+
+    const tokenResponse = await axios
+      .post(NAVER_TOKEN_URL, null, {
+        params: {
+          client_id: process.env.NAVER_CLIENT_ID,
+          client_secret: process.env.NAVER_CLIENT_SECRET,
+          redirect_uri: process.env.NAVER_REDIRECT_URL,
+          grant_type: 'authorization_code',
+          code: code,
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .catch((error) => {
+        console.error('네이버 토큰 요청 실패:', error.response?.data);
+      });
+
+    const accessToken = tokenResponse?.data.access_token;
+
+    const userResponse = await axios
+      .get(NAVER_USER_INFO_URL, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .catch((error) => {
+        console.error('네이버 사용자 정보 요청 실패:', error.response?.data);
+      });
+
+    const naverAccount = userResponse?.data.response;
+    console.log('네이버 사용자 정보:', naverAccount);
+
+    let user = await this.userRepository.findOne({
+      where: { email: naverAccount.email },
+    });
+
+    if (!user) {
+      user = this.userRepository.create({
+        email: naverAccount.email,
+        name: naverAccount.name ?? '네이버 사용자',
+        phone: naverAccount.mobile ?? '000-0000-0000',
+        provider: 'naver',
+      });
+      await this.userRepository.save(user);
     }
 
     return user;
-}
+  }
 
-    // 구글 로그인
-    async googleUser(code: string) {
-        console.log("구글 로그인 요청, 받은 코드:", code);
-    
-        const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-        const GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
-    
-        const tokenResponse = await axios.post(GOOGLE_TOKEN_URL, null, {
-            params: {
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                redirect_uri: process.env.GOOGLE_REDIRECT_URL,
-                grant_type: "authorization_code",
-                code: code,
-            },
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        }).catch(error => {
-            console.error("구글 토큰 요청 실패:", error.response?.data);
-        });
-    
-        const accessToken = tokenResponse?.data.access_token;
-    
-        const userResponse = await axios.get(GOOGLE_USER_INFO_URL, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        }).catch(error => {
-            console.error("구글 사용자 정보 요청 실패:", error.response?.data);
-        });
-    
-        const googleAccount = userResponse?.data;
-        console.log("구글 사용자 정보:", googleAccount);
-    
-        let user = await this.userRepository.findOne({
-            where: { email: googleAccount.email },
-        });
-    
-        if (!user) {
-            user = this.userRepository.create({
-                email: googleAccount.email,
-                provider: "google",
-            });
-            await this.userRepository.save(user);
-        }
-    
-        return user;
+  // 구글 로그인
+  async googleUser(code: string) {
+    console.log('구글 로그인 요청, 받은 코드:', code);
+
+    const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+    const GOOGLE_USER_INFO_URL =
+      'https://www.googleapis.com/oauth2/v2/userinfo';
+
+    const tokenResponse = await axios
+      .post(GOOGLE_TOKEN_URL, null, {
+        params: {
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          redirect_uri: process.env.GOOGLE_REDIRECT_URL,
+          grant_type: 'authorization_code',
+          code: code,
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .catch((error) => {
+        console.error('구글 토큰 요청 실패:', error.response?.data);
+      });
+
+    const accessToken = tokenResponse?.data.access_token;
+
+    const userResponse = await axios
+      .get(GOOGLE_USER_INFO_URL, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .catch((error) => {
+        console.error('구글 사용자 정보 요청 실패:', error.response?.data);
+      });
+
+    const googleAccount = userResponse?.data;
+    console.log('구글 사용자 정보:', googleAccount);
+
+    let user = await this.userRepository.findOne({
+      where: { email: googleAccount.email },
+    });
+
+    if (!user) {
+      user = this.userRepository.create({
+        email: googleAccount.email,
+        provider: 'google',
+      });
+      await this.userRepository.save(user);
     }
+
+    return user;
+  }
 
   // sns JWT 토큰 발급
   async snsToken(user: any) {
@@ -231,13 +241,13 @@ export class AuthService {
       provider: user.provider,
     };
     const accessToken = this.jwtService.sign(payload, {
-        secret: process.env.JWT_SECRET,
-        expiresIn: '1h',
+      secret: process.env.JWT_SECRET,
+      expiresIn: '1h',
     });
-    
+
     const refreshToken = this.jwtService.sign(payload, {
-        secret: process.env.JWT_SECRET,
-        expiresIn: '7d',
+      secret: process.env.JWT_SECRET,
+      expiresIn: '7d',
     });
 
     // refresh 토큰 db 저장?
@@ -247,36 +257,36 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-    // 아이디 찾기
-    async findId(name:string, phone:string){
-        const user = await this.userRepository.findOne({where: {name, phone}});
-        if(!user){
-            return { message: '저장된 아이디 없음' };
-        }
-
-        return { email: user.email };
-    }
-    // 비밀번호 찾기
-    async findPW(email:string, phone:string){
-        const user = await this.userRepository.findOne({where: {email, phone}});
-        if(!user){
-            return { message: '저장된 비밀번호 없음' };
-        }
-
-        return { userID: user.id };
+  // 아이디 찾기
+  async findId(name: string, phone: string) {
+    const user = await this.userRepository.findOne({ where: { name, phone } });
+    if (!user) {
+      return { message: '저장된 아이디 없음' };
     }
 
-    // 새 비밀번호 업데이트
-    async updatePW(userID: number, newPassword: string){
-        const user = await this.userRepository.findOne({ where: { id: userID } });
-        if (!user) {
-            return { message: '사용자 없음' };
-        }
-
-        const hashPW = await bcrypt.hash(newPassword, 10); // 비밀번호 암호화
-        user.password = hashPW;
-        await this.userRepository.save(user);
-
-        return { message: '새 비밀번호 저장 성공' };
+    return { email: user.email };
+  }
+  // 비밀번호 찾기
+  async findPW(email: string, phone: string) {
+    const user = await this.userRepository.findOne({ where: { email, phone } });
+    if (!user) {
+      return { message: '저장된 비밀번호 없음' };
     }
+
+    return { userID: user.id };
+  }
+
+  // 새 비밀번호 업데이트
+  async updatePW(userID: number, newPassword: string) {
+    const user = await this.userRepository.findOne({ where: { id: userID } });
+    if (!user) {
+      return { message: '사용자 없음' };
+    }
+
+    const hashPW = await bcrypt.hash(newPassword, 10); // 비밀번호 암호화
+    user.password = hashPW;
+    await this.userRepository.save(user);
+
+    return { message: '새 비밀번호 저장 성공' };
+  }
 }
