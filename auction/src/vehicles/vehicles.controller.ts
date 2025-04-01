@@ -8,6 +8,7 @@ export class VehiclesController {
         private readonly vehicleService: VehiclesService
     ) {}
 
+    // 차량 정보 가져오기
     @UseGuards(JwtAuthGuard)
     @Get('/vehicleData')
     async carOwnership(@Req() req){

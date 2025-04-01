@@ -40,4 +40,21 @@ export class PayService {
 
         return refundData;
     }
+
+    // 토스 결제정보 저장
+    async tossSave(userId: number, body: any) {
+        const user = await this.userRepository.findOne({ where: {id: userId}});
+        if(!user) {
+            return { message: '유저정보 없음' };
+        }
+
+        const payment = this.payRepository.create({
+            user,
+            amount: body.amount,
+            payment_method: body.payment_method,
+            status: body.status,
+        });
+
+        return await this.payRepository.save(payment);
+    }
 }

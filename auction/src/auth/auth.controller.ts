@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, Us
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -29,25 +30,25 @@ export class AuthController {
 
     // 로그인 성공 응답
     return res.json({ message: '로그인 성공', id, email });
-    }
+  }
 
-    // 쿠키에서 토큰 꺼내기
-    @Get('/tokenCheck')
-    @UseGuards(AuthGuard('jwt'))
-    async tokenCheck(@Req() req: Request) {
-        // console.log("req.user 정보:", req.user);
-        if (!req.cookies || !req.cookies.accessToken) {
-            throw new UnauthorizedException('쿠키가 없음');
-        }
-        return { message: "로그인 유지됨", token: req.user };    
-    }
-    
-    // 카카오 로그인 API
-    @Get('/kakao')
-    @UseGuards(AuthGuard('kakao'))
-    async kakaoLogin(@Req() req: Request){
-        // 카카오 로그인 페이지로 자동 리다이렉트
-    }
+  // 쿠키에서 토큰 꺼내기
+  @Get('/tokenCheck')
+  @UseGuards(AuthGuard('jwt'))
+  async tokenCheck(@Req() req: Request) {
+      // console.log("req.user 정보:", req.user);
+      if (!req.cookies || !req.cookies.accessToken) {
+          throw new UnauthorizedException('쿠키가 없음');
+      }
+      return { message: "로그인 유지됨", token: req.user };    
+  }
+  
+  // 카카오 로그인 API
+  @Get('/kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async kakaoLogin(@Req() req: Request){
+      // 카카오 로그인 페이지로 자동 리다이렉트
+  }
 
   // 네이버 로그인 API
   @Get('/naver')
@@ -118,5 +119,17 @@ export class AuthController {
   @Post('/pwfind/updatepw')
   async pwFinde(@Body() body: { password: string; userID: number }) {
     return this.authService.updatePW(body.userID, body.password);
+  }
+
+  // 로그아웃
+  @Post('/logout')
+  async logout(@Res() res: Response){
+    console.log('요청받았나?')
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    res.clearCookie('refreshToken');
+    return res.send({ message: "토큰삭제 완료" });
   }
 }

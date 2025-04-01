@@ -8,7 +8,8 @@ export class PayController {
         private readonly payService: PayService
     ) {}
 
-    @UseGuards(JwtAuthGuard) // jwt 인증함
+    // 환불 정보 저장
+    @UseGuards(JwtAuthGuard)
     @Post('/refund-point')
     async refundPoint(@Req() req, @Body() body){
         const userId = req.user.id; // jwt에서 유저id 가져옴
@@ -16,12 +17,21 @@ export class PayController {
 
         return await this.payService.getRefundInfo(userId, account, cardCompany, refundPoint);
     }
-
-    @UseGuards(JwtAuthGuard) // jwt 인증함
+    
+    // 환불 성공여부 전달
+    @UseGuards(JwtAuthGuard)
     @Get('/refundData')
     async refundCheck(@Req() req){
         const userId = req.user.id; // jwt에서 유저id 가져옴
-        return this.payService.refundState(userId);
+        return await this.payService.refundState(userId);
+    }
+
+    // 토스 결제 정보 저장
+    @UseGuards(JwtAuthGuard)
+    @Post('/save')
+    async tossSave(@Req() req, @Body() body: any ){
+        const userId = req.user.id;
+        return await this.payService.tossSave(userId, body);
     }
 }
 
