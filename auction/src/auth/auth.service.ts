@@ -85,7 +85,6 @@ export class AuthService {
       .catch((error) => {
         console.error('카카오 토큰 요청 실패:', error.response?.data);
       });
-
     const accessToken = tokenResponse?.data.access_token;
 
     // 2. 액세스 토큰으로 사용자 정보 받아오기
@@ -108,15 +107,14 @@ export class AuthService {
     let user = await this.userRepository.findOne({
       where: { email: kakaoAccount.email },
     });
-
     if (!user) {
       user = this.userRepository.create({
         email: kakaoAccount.email,
         provider: 'kakao',
       });
       await this.userRepository.save(user);
-      console.log(user, '정신차려라')
-      return { message: '가입되지 않은 유저' };
+      console.log(user.id, '정신차려라');
+      return user.id;
     }
     console.log('카카오 사용자 정보:', userResponse?.data);
 
@@ -229,6 +227,8 @@ export class AuthService {
         provider: 'google',
       });
       await this.userRepository.save(user);
+      console.log(googleAccount.email);
+      return { email: googleAccount.email };
     }
 
     return user;
@@ -288,24 +288,24 @@ export class AuthService {
     user.password = hashPW;
     await this.userRepository.save(user);
 
-        return { message: '새 비밀번호 저장 성공' };
+    return { message: '새 비밀번호 저장 성공' };
+  }
+
+  // 소셜로그인 추가 입력
+  async plusInfo(userID: number, name: string, phone: string) {
+    const user = await this.userRepository.findOne({ where: { id: userID } });
+    if (!user) {
+      return { message: '사용자 없음' };
     }
 
-    // 소셜로그인 추가 입력
-    async plusInfo(userID:number, name:string, phone:string){
-        const user = await this.userRepository.findOne({ where: {id:userID}});
-        if (!user) {
-            return { message: '사용자 없음' };
-        }
+    const plusinfo = await this.userRepository.create({
+      name: name,
+      phone: phone,
+    });
 
-        const plusinfo = await this.userRepository.create({
-            name: name,
-            phone: phone
-        })
-        
-        console.log('사용자정보어떠냐', plusinfo)
-        await this.userRepository.save(plusinfo);
-        
-        return { message: '소셜로그인 추가정보 저장 성공' };
-    }
+    console.log('사용자정보어떠냐', plusinfo);
+    await this.userRepository.save(plusinfo);
+
+    return { message: '소셜로그인 추가정보 저장 성공' };
+  }
 }

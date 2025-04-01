@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -10,9 +20,21 @@ export class AuthController {
   // 회원가입 API
   @Post('/signup')
   async signUp(
-    @Body() body: { email: string; password: string; name: string; phone: string;}) {
-      return this.authService.signUp( body.email, body.password, body.name, body.phone);
-    }
+    @Body()
+    body: {
+      email: string;
+      password: string;
+      name: string;
+      phone: string;
+    },
+  ) {
+    return this.authService.signUp(
+      body.email,
+      body.password,
+      body.name,
+      body.phone,
+    );
+  }
 
   // 로컬 로그인 API
   @Post('/login')
@@ -24,8 +46,8 @@ export class AuthController {
     }
     // 쿠키에 토큰 저장
     res.cookie('accessToken', token, {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24, // 1일 유지
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
 
     // 로그인 성공 응답
@@ -36,18 +58,18 @@ export class AuthController {
   @Get('/tokenCheck')
   @UseGuards(AuthGuard('jwt'))
   async tokenCheck(@Req() req: Request) {
-      // console.log("req.user 정보:", req.user);
-      if (!req.cookies || !req.cookies.accessToken) {
-          throw new UnauthorizedException('쿠키가 없음');
-      }
-      return { message: "로그인 유지됨", token: req.user };    
+    // console.log("req.user 정보:", req.user);
+    if (!req.cookies || !req.cookies.accessToken) {
+      throw new UnauthorizedException('쿠키가 없음');
+    }
+    return { message: '로그인 유지됨', token: req.user };
   }
-  
+
   // 카카오 로그인 API
   @Get('/kakao')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoLogin(@Req() req: Request){
-      // 카카오 로그인 페이지로 자동 리다이렉트
+  async kakaoLogin(@Req() req: Request) {
+    // 카카오 로그인 페이지로 자동 리다이렉트
   }
 
   // 네이버 로그인 API
@@ -66,7 +88,11 @@ export class AuthController {
 
   // sns 로그인 타입 구별
   @Post('login/:type')
-  async socialLogin(@Param('type') type: string, @Res() res: Response ,@Body() body: { code: string }) {
+  async socialLogin(
+    @Param('type') type: string,
+    @Res() res: Response,
+    @Body() body: { code: string },
+  ) {
     // console.log(`프론트에서 받은타입 ${type}`);
     // console.log(`프론트에서 받은코드 ${body.code}`);
     let user;
@@ -81,25 +107,21 @@ export class AuthController {
       user = await this.authService.googleUser(body.code);
     }
 
-    if (!user) {
-      return { message: '200 소셜로그인 실패' };
-    }
-
     // jwt 토큰 발급
     const token = await this.authService.snsToken(user);
 
     // 쿠키에 저장
     res.cookie('accessToken', token.accessToken, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 1000, // 1시간
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000, // 1시간
     });
 
     res.cookie('refreshToken', token.refreshToken, {
-        httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
-    return res.json({ message: '로그인 성공' });
+    return res.json({ user });
   }
 
   // 아이디 찾기
@@ -123,18 +145,18 @@ export class AuthController {
 
   // 로그아웃
   @Post('/logout')
-  async logout(@Res() res: Response){
+  async logout(@Res() res: Response) {
     res.clearCookie('accessToken', {
       httpOnly: true,
       sameSite: 'lax',
     });
     res.clearCookie('refreshToken');
-    return res.send({ message: "토큰삭제 완료" });
+    return res.send({ message: '토큰삭제 완료' });
   }
 
   // 소셜로그인 추가 입력
   @Post('/social/plusinfo')
-  async socialPlus(@Body() body){
+  async socialPlus(@Body() body) {
     console.log('나타나냐?', body);
     const { userID, name, phone } = body;
     return await this.authService.plusInfo(userID, name, phone);
