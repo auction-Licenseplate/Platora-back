@@ -115,7 +115,8 @@ export class AuthService {
         provider: 'kakao',
       });
       await this.userRepository.save(user);
-      return { message: '가입되지 않은 유저', user };
+      console.log(user, '정신차려라')
+      return { message: '가입되지 않은 유저' };
     }
     console.log('카카오 사용자 정보:', userResponse?.data);
 

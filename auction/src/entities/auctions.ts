@@ -14,6 +14,9 @@ export class Auctions {
     @ManyToOne(() => Vehicles, (vehicle) => vehicle.id)
     vehicle: Vehicles;
 
+    @Column('varchar', {comment:'제목', nullable: true})
+    title: string;
+
     @Column('text', {comment:'경매 이미지', nullable: true})
     car_img: string;
     
