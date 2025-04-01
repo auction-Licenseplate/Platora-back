@@ -4,16 +4,22 @@ import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
+import { Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+
+interface AuthRequest extends Request{
+    user: {id: number};
+}
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
+    // 사용자 정보 자동 출력
     @Get('/user-info')
-    @UseGuards(JwtAuthGuard)
-    async userInfo(@Req() req) {
+    @UseGuards(AuthGuard('jwt'))
+    async userInfo(@Req() req: AuthRequest) {
         const user = req.user;
-        // console.log('사용자id 확인용: ', user);
         return await this.userService.getUserInfo(user.id);
     };
 
@@ -21,6 +27,7 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     async passwordCheck(@Req() req) {
         const user = req.user;
+        // console.log(user)
         return await this.userService.passChange(user.id);
     }
 
