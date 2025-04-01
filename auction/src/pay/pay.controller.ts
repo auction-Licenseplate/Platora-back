@@ -26,6 +26,12 @@ export class PayController {
         return await this.payService.refundState(userId);
     }
 
+    // 토스 클라이언트 키 전달
+    @Get('/toss-client-key')
+    async tossClient(){
+        return { key : process.env.TOSS_CLIENT_KEY } 
+    }
+    
     // 토스 결제 정보 저장
     @UseGuards(JwtAuthGuard)
     @Post('/save')

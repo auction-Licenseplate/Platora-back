@@ -279,4 +279,22 @@ export class AuthService {
 
         return { message: '새 비밀번호 저장 성공' };
     }
+
+    // 소셜로그인 추가 입력
+    async plusInfo(userID:number, name:string, phone:string){
+        const user = await this.userRepository.findOne({ where: {id:userID}});
+        if (!user) {
+            return { message: '사용자 없음' };
+        }
+
+        const plusinfo = await this.userRepository.create({
+            name: name,
+            phone: phone
+        })
+        
+        console.log('사용자정보어떠냐', plusinfo)
+        await this.userRepository.save(plusinfo);
+        
+        return { message: '소셜로그인 추가정보 저장 성공' };
+    }
 }

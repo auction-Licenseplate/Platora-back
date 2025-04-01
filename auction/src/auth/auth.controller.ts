@@ -124,12 +124,19 @@ export class AuthController {
   // 로그아웃
   @Post('/logout')
   async logout(@Res() res: Response){
-    console.log('요청받았나?')
     res.clearCookie('accessToken', {
       httpOnly: true,
       sameSite: 'lax',
     });
     res.clearCookie('refreshToken');
     return res.send({ message: "토큰삭제 완료" });
+  }
+
+  // 소셜로그인 추가 입력
+  @Post('/social/plusinfo')
+  async socialPlus(@Body() body){
+    console.log('나타나냐?', body);
+    const { userID, name, phone } = body;
+    return await this.authService.plusInfo(userID, name, phone);
   }
 }

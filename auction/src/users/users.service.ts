@@ -19,7 +19,7 @@ export class UsersService {
         return user;
     }
 
-    // 비밀번호 변경가능한지 체크 (요청 오고 재수정)
+    // 비밀번호 변경가능한지 체크
     async passChange(userId: number) {
         const user = await this.userRepository.findOne({
             where: { id: userId },
