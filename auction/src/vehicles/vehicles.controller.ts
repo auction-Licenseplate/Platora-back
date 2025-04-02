@@ -1,4 +1,13 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Req,
+  UseGuards,
+  Post,
+  UseInterceptors,
+  UploadedFiles,
+  Body,
+} from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
