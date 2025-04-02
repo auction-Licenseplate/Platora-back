@@ -32,7 +32,7 @@ export class AuthService {
     });
 
     await this.userRepository.save(newUser); // db에 저장
-    const userEmail = newUser.email
+    const userEmail = newUser.email;
     return { message: '회원가입 성공', userEmail };
   }
 
@@ -228,7 +228,6 @@ export class AuthService {
       });
       await this.userRepository.save(user);
       return user.id;
-- 
     }
 
     return user;
@@ -308,10 +307,11 @@ export class AuthService {
   }
 
   // 이메일, 번호 중복검사
-  async duplicateCheck(type: string, valueToCheck: string){
-    const condition = type === 'email' ? { email: valueToCheck } : { phone: valueToCheck };
+  async duplicateCheck(type: string, valueToCheck: string) {
+    const condition =
+      type === 'email' ? { email: valueToCheck } : { phone: valueToCheck };
     const user = await this.userRepository.findOne({ where: condition });
 
-    return {message: user ? '중복됨' : '사용 가능', type, exists: !!user};
+    return { message: user ? '중복됨' : '사용 가능', type, exists: !!user };
   }
 }
