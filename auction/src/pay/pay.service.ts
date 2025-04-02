@@ -58,12 +58,18 @@ export class PayService {
         }
 
         const payment = this.payRepository.create({
-            user,
+            user: { id: userId },
             amount: body.amount,
             payment_method: body.payment_method,
             status: body.status,
         });
 
-        return await this.payRepository.save(payment);
+        // 유저테이블 point 반영
+        user.point! += body.amount;
+        await this.userRepository.save(user);
+
+        await this.payRepository.save(payment);
+
+        return { message: '결제정보 저장완료', payment };
     }
 }
