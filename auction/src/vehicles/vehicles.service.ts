@@ -2,36 +2,74 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config'; // ConfigService 추가
-import OpenAI from 'openai'; // OpenAI SDK 임포트
+import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 
 @Injectable()
 export class VehiclesService {
-  private readonly openai: OpenAI;
+  private readonly ZEMINAR_API_KEY: string;
 
   constructor(
     @InjectRepository(Vehicles)
     private vehicleRepository: Repository<Vehicles>,
-    private configService: ConfigService, // ConfigService 주입
+    private configService: ConfigService,
   ) {
-    // OpenAI 인스턴스를 환경변수에서 API 키를 사용하여 초기화
-    this.openai = new OpenAI({
-      apiKey: this.configService.get<string>('OPENAI_API_KEY'), // OPENAI_API_KEY를 환경변수에서 가져옴
-    });
+    this.ZEMINAR_API_KEY =
+      this.configService.get<string>('ZEMINAR_API_KEY') ?? '';
+    console.log('ZEMINAR_API_KEY:', this.ZEMINAR_API_KEY); // 환경 변수 확인 로그
   }
 
-  // 차량 정보 제공
   async getCarData(userId: number) {
-    const carData = await this.vehicleRepository.find({
+    return this.vehicleRepository.find({
       where: { user: { id: userId } },
       select: ['plate_num', 'ownership_status'],
     });
+  }
 
-    return carData;
+  async chatWithZeminar(userMessage: string) {
+    try {
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.ZEMINAR_API_KEY}`,
+        {
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: userMessage }],
+            },
+          ],
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const { candidates } = response.data;
+      if (!candidates || candidates.length === 0) {
+        throw new Error('재미나이 API에서 유효한 응답이 없음');
+      }
+
+      const text = candidates?.[0]?.content?.parts?.[0]?.text;
+      console.log(text);
+      return text;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          '재미나이 API 오류:',
+          error.response?.status,
+          error.response?.data,
+        );
+        throw new Error(`재미나이 API 오류: ${error.response?.status}`);
+      } else {
+        console.error('알 수 없는 오류:', error);
+        throw new Error('알 수 없는 오류 발생');
+      }
+    }
   }
 
   // 작성글 저장
-  async saveCarImg(userId: number, body: any, files: Express.Multer.File[]){
+  async saveCarImg(userId: number, body: any, files: Express.Multer.File[]) {
     // 파일 이름으로 저장 (쉼표 구분)
     const filename = files.map((file) => file.filename).join(',');
     let vehicle = await this.vehicleRepository.findOne({
@@ -53,13 +91,4 @@ export class VehiclesService {
     await this.vehicleRepository.save(vehicle!);
     return { message: '작성글 저장완료', vehicle };
   }
-
-  // OpenAI 챗 API 호출
-  // async chat(message: any) {
-  //   const chatCompletion = await this.openai.chat.completions.create({
-  //     messages: message,
-  //     // model: this.configService.get('OPENAI_API_MODEL'), // 모델 이름은 환경변수에서 가져올 수 있습니다.
-  //   });
-  //   return chatCompletion.choices[0].message.content;
-  // }
 }
