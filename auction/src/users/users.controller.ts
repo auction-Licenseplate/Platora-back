@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -23,6 +23,7 @@ export class UsersController {
         return await this.userService.getUserInfo(user.id);
     };
 
+    // 비밀번호 변경 가능 여부 확인
     @Get('/passCheck')
     @UseGuards(JwtAuthGuard)
     async passwordCheck(@Req() req) {
@@ -31,22 +32,34 @@ export class UsersController {
         return await this.userService.passChange(user.id);
     }
 
-    @Post('/upload')
+    // 이용약관 체크
+    @Post('/userCheck')
+    @UseGuards(JwtAuthGuard)
+    async agreeCheck(@Body() body){
+        console.log(body, '잘가져왔니?')
+    }
+
+    // 공인인증서 저장
+    @Post('/certificate')
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
-            destination: (req, file, cb) => {
-                cb(null, join(__dirname, '../../uploads'));
-            },
-            filename: (req, file, cb) => {
-                cb(null, `${Date.now()}_${file.originalname}`);
+            destination: join(__dirname, '../../uploads'), // 저장할 경로
+            filename: (req, file, callback) => {
+                const filename = `${Date.now()}_${file.originalname}`;
+                callback(null, filename);
             },
         }),
     }))
-    async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req){
-        console.log(file);
+    async saveCertification(@UploadedFile() file: Express.Multer.File, @Body() body, @Req() req){
+        console.log('업로드된 파일:', file);  // 업로드된 파일 정보 확인
+        if (!file) {
+            return { message: '파일 없음' };
+        }
+
         // 파일 처리 로직
         const userId = req.user.id;
-        return await this.userService.saveFile(userId, file.filename);
+        console.log('유저 ID:', userId);  // 유저 ID 확인
+        return await this.userService.saveFile(userId, body, file);
     }
 }

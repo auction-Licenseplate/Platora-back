@@ -13,11 +13,15 @@ export class PayService {
         private userRepository: Repository<Users>,
     ) {}
 
-    // 환불 정보 저장
+    // 환불할 포인트
     async getRefundInfo(userId: number, account: string, cardCompany: string, refundPoint: number) {
         const user = await this.userRepository.findOne({where: {id:userId}})
         if(!user) {
             return { message: '유저정보 없음' };
+        }
+
+        if (user.point! < refundPoint) {
+            return { message: '잔여 포인트 부족' };
         }
 
         const refund = await this.payRepository.create({
@@ -25,10 +29,15 @@ export class PayService {
             account,
             card_company: cardCompany,
             refund_amount: refundPoint,
-        })
+            refund_status: 'success',
+        });
+
+        // 환불 처리 후 유저테이블 포인트 업데이트
+        user.point! -= refundPoint;
+        await this.userRepository.save(user);
 
         await this.payRepository.save(refund); // db에 저장
-        return { message: '환불정보 저장 성공' };
+        return { message: '환불정보 저장 성공', refund, remainPoint: user.point };
     }
 
     // 환불 성공여부 전달
@@ -49,12 +58,27 @@ export class PayService {
         }
 
         const payment = this.payRepository.create({
-            user,
+            user: { id: userId },
             amount: body.amount,
             payment_method: body.payment_method,
             status: body.status,
         });
 
-        return await this.payRepository.save(payment);
+        // 유저테이블 point 반영
+        user.point! += body.amount;
+        await this.userRepository.save(user);
+
+        await this.payRepository.save(payment);
+
+        return { message: '결제정보 저장완료', payment };
+    }
+
+    // 사용자 포인트 정보 전달
+    async pointData(userId: number){
+        const payPoint = await this.payRepository.find({
+            where: {user: {id: userId}},
+            select: ['amount', 'refund_amount', 'status', 'refund_status']
+        })
+        return { message: '포인트정보 전달 완료', payPoint} ;
     }
 }

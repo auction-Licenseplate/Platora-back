@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -157,8 +147,24 @@ export class AuthController {
   // 소셜로그인 추가 입력
   @Post('/social/plusinfo')
   async socialPlus(@Body() body) {
-    console.log('나타나냐?', body);
     const { userID, name, phone } = body;
     return await this.authService.plusInfo(userID, name, phone);
+  }
+
+  // 이메일, 번호 중복검사
+  @Post('/check/:type')
+  async duplicateData(@Param('type') type: string, @Body() body){
+    const { email, phone } = body;
+
+    let valueToCheck;
+
+    if(type === 'email'){
+      valueToCheck = email;
+    }
+    if(type === 'phone'){
+      valueToCheck = phone;
+    }
+
+    return await this.authService.duplicateCheck(type, valueToCheck);
   }
 }

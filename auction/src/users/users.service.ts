@@ -30,15 +30,17 @@ export class UsersService {
     }
 
     // 공인인증서 db 저장
-    async saveFile(userId: number, filePath: string){
+    async saveFile(userId: number, body:any, file: Express.Multer.File){
+        const filename = file.filename
+        console.log('파일 경로:', filename);  // filePath 확인
+
         const user = await this.userRepository.findOne({where: { id: userId }})
         if(!user) {
             return { message: '유저정보 없음' };
         }
 
-        user.certification = filePath;
         await this.userRepository.save(user);
         
-        return {message: '파일 업로드 성공'};
+        return {message: '인증 업로드 성공'};
     }
 }
