@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -164,9 +154,8 @@ export class AuthController {
   // 이메일, 번호 중복검사
   @Post('/check/:type')
   async duplicateData(@Param('type') type: string, @Body() body){
-    console.log('어케나타날까', body);
     const { email, phone } = body;
-    
+
     let valueToCheck;
 
     if(type === 'email'){
