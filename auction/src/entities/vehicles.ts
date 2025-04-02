@@ -9,7 +9,7 @@ export class Vehicles {
     @ManyToOne(() => Users, (user) => user.id)
     user: Users;
 
-    @Column('varchar', {comment:'작성제목', length: 255})
+    @Column('varchar', {comment:'작성제목', length: 255, nullable: true})
     title: string;
 
     @Column('varchar', {comment:'번호판 이미지', nullable: true})
