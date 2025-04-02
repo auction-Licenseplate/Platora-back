@@ -36,10 +36,16 @@ export class PayController {
     @UseGuards(JwtAuthGuard)
     @Post('/save')
     async tossSave(@Req() req, @Body() body: any ){
-        console.log('넌어떻게나타나니',body)
-        // { payment_method: '카드', amount: 342, status: 'success' } 이렇게 나타남
         const userId = req.user.id;
         return await this.payService.tossSave(userId, body);
+    }
+
+    // 사용자 포인트 정보 전달
+    @UseGuards(JwtAuthGuard)
+    @Get('/payInfo')
+    async userPoint(@Req() req){
+        const userId = req.user.id;
+        return await this.payService.pointData(userId);
     }
 }
 

@@ -72,4 +72,13 @@ export class PayService {
 
         return { message: '결제정보 저장완료', payment };
     }
+
+    // 사용자 포인트 정보 전달
+    async pointData(userId: number){
+        const payPoint = await this.payRepository.find({
+            where: {user: {id: userId}},
+            select: ['amount', 'refund_amount', 'status', 'refund_status']
+        })
+        return { message: '포인트정보 전달 완료', payPoint} ;
+    }
 }

@@ -30,17 +30,19 @@ export class VehiclesService {
     return carData;
   }
 
-  // 번호판 이미지 저장
-  async saveCarImg(body: any, files: Express.Multer.File[]){
+  // 작성글 저장
+  async saveCarImg(userId: number, body: any, files: Express.Multer.File[]){
     // 파일 이름으로 저장 (쉼표 구분)
     const filename = files.map((file) => file.filename).join(',');
     const vehicle = this.vehicleRepository.create({
+      user: {id: userId},
       title: body.title,
       car_info: body.car_info,
       car_img: filename
     });
 
-    return await this.vehicleRepository.save(vehicle);
+    await this.vehicleRepository.save(vehicle);
+    return { message: '작성글 저장완료', vehicle };
   }
 
   // OpenAI 챗 API 호출
