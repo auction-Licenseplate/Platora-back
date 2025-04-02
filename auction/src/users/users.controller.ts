@@ -53,6 +53,7 @@ export class UsersController {
     }))
     async saveCertification(@UploadedFile() file: Express.Multer.File, @Body() body, @Req() req){
         console.log('업로드된 파일:', file);  // 업로드된 파일 정보 확인
+        console.log('받은 차량 번호:', body.vehicleNumber);
         if (!file) {
             return { message: '파일 없음' };
         }
@@ -60,6 +61,6 @@ export class UsersController {
         // 파일 처리 로직
         const userId = req.user.id;
         console.log('유저 ID:', userId);  // 유저 ID 확인
-        return await this.userService.saveFile(userId, body, file);
+        return await this.userService.saveFile(userId, body.vehicleNumber, file);
     }
 }

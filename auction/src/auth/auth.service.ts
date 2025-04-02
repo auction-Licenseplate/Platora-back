@@ -32,7 +32,8 @@ export class AuthService {
     });
 
     await this.userRepository.save(newUser); // db에 저장
-    return { message: '회원가입 성공' };
+    const userEmail = newUser.email
+    return { message: '회원가입 성공', userEmail };
   }
 
   // 일반 로그인
@@ -112,7 +113,6 @@ export class AuthService {
         provider: 'kakao',
       });
       await this.userRepository.save(user);
-      console.log(user.id, '정신차려라');
       return user.id;
     }
     console.log('카카오 사용자 정보:', userResponse?.data);
@@ -171,7 +171,6 @@ export class AuthService {
         provider: 'naver',
       });
       await this.userRepository.save(user);
-      console.log(user.id, '정신차려두번째네이버');
       return user.id;
     }
 
@@ -228,8 +227,6 @@ export class AuthService {
         provider: 'google',
       });
       await this.userRepository.save(user);
-      console.log(googleAccount.email);
-      console.log(user.id, '정신차려라세번째구글자식아');
       return user.id;
     }
 
