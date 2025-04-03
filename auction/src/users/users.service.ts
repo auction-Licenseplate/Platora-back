@@ -71,7 +71,7 @@ export class UsersService {
     await this.userRepository.save(user);
 
     const plateNum = body.vehicleNumber; // vehicle에 차량번호 저장
-    const vehicle = await this.vehicleRepository.create({
+    const vehicle = this.vehicleRepository.create({
       user,
       plate_num: plateNum,
     });

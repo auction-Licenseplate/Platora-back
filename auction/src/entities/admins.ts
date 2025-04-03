@@ -25,9 +25,6 @@ export class Admins {
     @Column('timestamp', {comment:'경매끝나는 날짜'})
     auction_end: Date;
 
-    @Column({ type: 'enum', enum: ['approved', 'rejected'], default: 'rejected' })
-    approval_status: string;
-
     @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
     write_status: string;
 

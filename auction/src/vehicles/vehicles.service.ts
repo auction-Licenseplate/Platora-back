@@ -6,17 +6,11 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class VehiclesService {
-  private readonly ZEMINAR_API_KEY: string;
-
   constructor(
     @InjectRepository(Vehicles)
     private vehicleRepository: Repository<Vehicles>,
     private configService: ConfigService,
-  ) {
-    this.ZEMINAR_API_KEY =
-      this.configService.get<string>('ZEMINAR_API_KEY') ?? '';
-    console.log('ZEMINAR_API_KEY:', this.ZEMINAR_API_KEY); // 환경 변수 확인 로그
-  }
+  ) {}
 
   async getCarData(userId: number) {
     return this.vehicleRepository.find({
