@@ -7,10 +7,10 @@ export class Admins {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Users, (user) => user.id)
+    @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: "CASCADE" })
     user: Users;
 
-    @ManyToOne(() => Auctions, (auction) => auction.id)
+    @ManyToOne(() => Auctions, (auction) => auction.id, { cascade: true, onDelete: "CASCADE" })
     auction: Auctions;
 
     @Column('varchar', {comment: '배너 타이틀', nullable: true})

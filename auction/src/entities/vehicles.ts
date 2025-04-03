@@ -6,7 +6,7 @@ export class Vehicles {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Users, (user) => user.id)
+    @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: "CASCADE" })
     user: Users;
 
     @Column('varchar', {comment:'작성제목', length: 255, nullable: true})

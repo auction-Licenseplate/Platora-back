@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -36,6 +36,14 @@ export class UsersController {
     @Post('/userCheck')
     async agreeCheck(@Body() body){
         return await this.userService.userAgree(body.user_email, body.term);
+    }
+
+    // 회원 탈퇴
+    @Delete('/withdraw')
+    @UseGuards(JwtAuthGuard)
+    async userDelete(@Req() req){
+        const user = req.user;
+        return await this.userService.userOut(user.id);
     }
 
     // 공인인증서 저장

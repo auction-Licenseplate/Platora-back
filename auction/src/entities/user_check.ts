@@ -6,7 +6,7 @@ export class UserCheck {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Users, (user) => user.email)
+    @ManyToOne(() => Users, (user) => user.email, { cascade: true, onDelete: "CASCADE" })
     @JoinColumn({ name: 'user_email', referencedColumnName: 'email' })
     user: Users;
 
