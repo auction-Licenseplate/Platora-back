@@ -162,7 +162,7 @@ export class AuthController {
     return await this.authService.plusInfo(userID, name, phone);
   }
 
-  // 이메일, 번호 중복검사
+  // 회원가입 이메일, 번호 중복검사
   @Post('/check/:type')
   async duplicateData(@Param('type') type: string, @Body() body) {
     const { email, phone } = body;
@@ -177,5 +177,12 @@ export class AuthController {
     }
 
     return await this.authService.duplicateCheck(type, valueToCheck);
+  }
+
+  // 소셜로그인 번호 중복검사
+  @Post('/phoneCheck')
+  async socialDuplicate(@Body() body){
+    const { valueToCheck } = body;
+    return this.authService.socialDuplicateCheck(valueToCheck);
   }
 }

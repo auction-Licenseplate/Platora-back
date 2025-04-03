@@ -296,7 +296,6 @@ export class AuthService {
     user.name = name;
     user.phone = phone;
 
-    console.log('사용자정보어떠냐', user);
     await this.userRepository.save(user);
 
     return { message: '소셜로그인 추가정보 저장 성공' };
@@ -309,5 +308,11 @@ export class AuthService {
     const user = await this.userRepository.findOne({ where: condition });
 
     return { message: user ? '중복됨' : '사용 가능', type, exists: !!user };
+  }
+
+  // 소셜로그인 번호 중복검사
+  async socialDuplicateCheck(valueToCheck: string){
+    const user = await this.userRepository.findOne({ where: {phone: valueToCheck}});
+    return {message: '사용 가능', exists: !!user};
   }
 }

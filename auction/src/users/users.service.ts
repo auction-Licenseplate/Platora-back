@@ -35,27 +35,27 @@ export class UsersService {
     return { provider: user?.provider || '' };
   }
 
-    // 이용약관 저장
-    async userAgree(userEmail: string, term: string){
-        const user = await this.userRepository.findOne({ where: {email: userEmail} });
-        if(!user) {
-            return { message: '유저정보 없음' };
-        }
+  // 이용약관 저장
+  async userAgree(userEmail: string, term: string){
+      const user = await this.userRepository.findOne({ where: {email: userEmail} });
+      if(!user) {
+          return { message: '유저정보 없음' };
+      }
 
-        const checking = this.userCheckRepository.create({
-            user: user,
-            term: term
-        });
+      const checking = this.userCheckRepository.create({
+          user: user,
+          term: term
+      });
 
-        await this.userCheckRepository.save(checking);
-        return {message: '이용약관 저장 완료'};
-    }
+      await this.userCheckRepository.save(checking);
+      return {message: '이용약관 저장 완료'};
+  }
 
-    // 회원탈퇴
-    async userOut(userId: number){
-        await this.userRepository.delete({ id: userId });
-        return {message: '회원 탈퇴 완료'};
-    }
+  // 회원탈퇴
+  async userOut(userId: number){
+      await this.userRepository.delete({ id: userId });
+      return {message: '회원 탈퇴 완료'};
+  }
 
   // 공인인증서 db 저장
   async saveFile(userId: number, body: any, file: Express.Multer.File) {
