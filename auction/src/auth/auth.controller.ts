@@ -36,7 +36,7 @@ export class AuthController {
     }
     // 쿠키에 토큰 저장
     res.cookie('accessToken', token, {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
 
@@ -102,12 +102,12 @@ export class AuthController {
 
     // 쿠키에 저장
     res.cookie('accessToken', token.accessToken, {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 60 * 60 * 1000, // 1시간
     });
 
     res.cookie('refreshToken', token.refreshToken, {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
@@ -137,7 +137,7 @@ export class AuthController {
   @Post('/logout')
   async logout(@Res() res: Response) {
     res.clearCookie('accessToken', {
-      httpOnly: true,
+      // httpOnly: true,
       sameSite: 'lax',
     });
     res.clearCookie('refreshToken');

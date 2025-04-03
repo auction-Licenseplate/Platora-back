@@ -18,6 +18,7 @@ import { Payment } from './entities/payment';
 import { Favorites } from './entities/favorites';
 import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
+import { AdminsModule } from './admins/admins.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -54,7 +55,8 @@ import { Notifications } from './entities/notifications';
     UsersModule,
     AuthModule,
     PayModule,
-    VehiclesModule
+    VehiclesModule,
+    AdminsModule
   ],
   controllers: [AppController],
   providers: [AppService],
