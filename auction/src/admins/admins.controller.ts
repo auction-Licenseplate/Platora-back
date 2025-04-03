@@ -16,4 +16,14 @@ export class AdminsController {
   ) {
     return this.adminService.userinfo();
   }
+
+  @Get('/fileinfo')
+  async getFileInfo() {
+    return this.adminService.fileinfo();
+  }
+  @Get('/return')
+  async getReturPoint() {
+    console.log('🔍 getReturPoint() 실행됨'); // 실행 여부 확인
+    return this.adminService.returnpoint();
+  }
 }
