@@ -34,9 +34,8 @@ export class UsersController {
 
     // 이용약관 체크
     @Post('/userCheck')
-    @UseGuards(JwtAuthGuard)
     async agreeCheck(@Body() body){
-        console.log(body, '잘가져왔니?')
+        return await this.userService.userAgree(body.user_email, body.term);
     }
 
     // 공인인증서 저장

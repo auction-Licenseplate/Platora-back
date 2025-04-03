@@ -250,10 +250,6 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    // refresh 토큰 db 저장?
-    // user.refreshToken = refreshToken;
-    // await this.userRepository.save(user);
-
     return { accessToken, refreshToken };
   }
 

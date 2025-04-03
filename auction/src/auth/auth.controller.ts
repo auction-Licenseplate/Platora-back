@@ -144,16 +144,16 @@ export class AuthController {
     return this.authService.updatePW(body.userID, body.password);
   }
 
-  // 로그아웃
-  @Post('/logout')
-  async logout(@Res() res: Response) {
-    res.clearCookie('accessToken', {
-      // httpOnly: true,
-      sameSite: 'lax',
-    });
-    res.clearCookie('refreshToken');
-    return res.send({ message: '토큰삭제 완료' });
-  }
+  // 로그아웃 > 프론트에서 진행
+  // @Post('/logout')
+  // async logout(@Res() res: Response) {
+  //   res.clearCookie('accessToken', {
+  //     // httpOnly: true,
+  //     sameSite: 'lax',
+  //   });
+  //   res.clearCookie('refreshToken');
+  //   return res.send({ message: '토큰삭제 완료' });
+  // }
 
   // 소셜로그인 추가 입력
   @Post('/social/plusinfo')
