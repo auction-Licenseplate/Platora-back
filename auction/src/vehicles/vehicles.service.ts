@@ -51,7 +51,7 @@ export class VehiclesService {
       }
 
       const text = candidates?.[0]?.content?.parts?.[0]?.text;
-      console.log(text);
+
       return text;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -73,7 +73,7 @@ export class VehiclesService {
     // 파일 이름으로 저장 (쉼표 구분)
     const filename = files.map((file) => file.filename).join(',');
     let vehicle = await this.vehicleRepository.findOne({
-      where: { user: { id: userId }, plate_num: body.plate_num }
+      where: { user: { id: userId }, plate_num: body.plate_num },
     });
 
     // 기존 차량 정보 업데이트
