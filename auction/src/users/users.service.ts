@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserCheck } from 'src/entities/user_check';
 import { Users } from 'src/entities/users.entity';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
@@ -11,13 +12,15 @@ export class UsersService {
     private userRepository: Repository<Users>,
     @InjectRepository(Vehicles)
     private vehicleRepository: Repository<Vehicles>,
+    @InjectRepository(UserCheck)
+    private userCheckRepository: Repository<UserCheck>,
   ) {}
 
   // 마이페이지 정보 제공
   async getUserInfo(userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['name', 'phone', 'email', 'point'], // 필요한 필드만
+      select: ['name', 'phone', 'email', 'point', 'provider'], // 필요한 필드만
     });
     return user;
   }
@@ -30,6 +33,24 @@ export class UsersService {
     });
 
     return { provider: user?.provider || '' };
+  }
+
+  // 이용약관 저장
+  async userAgree(userEmail: string, term: string) {
+    const user = await this.userRepository.findOne({
+      where: { email: userEmail },
+    });
+    if (!user) {
+      return { message: '유저정보 없음' };
+    }
+
+    const checking = this.userCheckRepository.create({
+      user: user,
+      term: term,
+    });
+
+    await this.userCheckRepository.save(checking);
+    return { message: '이용약관 저장 완료' };
   }
 
   // 공인인증서 db 저장

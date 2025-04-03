@@ -23,4 +23,7 @@ export class Vehicles {
 
     @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
     ownership_status: string;
+
+    @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
+    write_status: string;
 }
