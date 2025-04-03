@@ -7,10 +7,10 @@ export class Payment {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Users, (user) => user.id)
+    @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: "CASCADE" })
     user: Users;
 
-    @ManyToOne(() => Auctions, (auction) => auction.id)
+    @ManyToOne(() => Auctions, (auction) => auction.id, { cascade: true, onDelete: "CASCADE" })
     auction: Auctions;
 
     @Column('varchar', {comment:'결제수단', nullable: true})

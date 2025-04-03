@@ -8,10 +8,10 @@ export class Auctions {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Users, (user) => user.id)
+    @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: "CASCADE" })
     user: Users;
 
-    @ManyToOne(() => Vehicles, (vehicle) => vehicle.id)
+    @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, { cascade: true, onDelete: "CASCADE" })
     vehicle: Vehicles;
 
     @Column('varchar', {comment:'제목', nullable: true})
@@ -20,7 +20,7 @@ export class Auctions {
     @Column('text', {comment:'경매 이미지', nullable: true})
     car_img: string;
     
-    @ManyToOne(() => Grades, (grade) => grade.id)
+    @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: "CASCADE" })
     grade_id: Grades;
 
     @ManyToOne(() => Grades, (grade) => grade.min_price)

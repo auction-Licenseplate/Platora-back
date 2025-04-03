@@ -41,7 +41,7 @@ export class UsersService {
         if(!user) {
             return { message: '유저정보 없음' };
         }
-        
+
         const checking = this.userCheckRepository.create({
             user: user,
             term: term
@@ -49,6 +49,12 @@ export class UsersService {
 
         await this.userCheckRepository.save(checking);
         return {message: '이용약관 저장 완료'};
+    }
+
+    // 회원탈퇴
+    async userOut(userId: number){
+        await this.userRepository.delete({ id: userId });
+        return {message: '회원 탈퇴 완료'};
     }
 
     // 공인인증서 db 저장
