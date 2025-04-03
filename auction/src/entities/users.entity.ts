@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 @Entity('users') // 테이블 이름
 export class Users {
   @PrimaryGeneratedColumn({type:'int', comment:'고유 사용자ID'})
@@ -30,7 +30,4 @@ export class Users {
 
   @CreateDateColumn({ type: 'timestamp' }) 
   created_at: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updated_at: Date;
 }

@@ -47,6 +47,14 @@ export class PayController {
         const userId = req.user.id;
         return await this.payService.pointData(userId);
     }
+
+    // 포인트 차감
+    @Post('/pointminus')
+    @UseGuards(JwtAuthGuard)
+    async userPointMins(@Req() req) {
+        const userId = req.user.id;
+        return await this.payService.pointDelete(userId);
+    }
 }
 
 

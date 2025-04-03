@@ -81,4 +81,21 @@ export class PayService {
         })
         return { message: '포인트정보 전달 완료', payPoint} ;
     }
+
+    // 사용자 포인트 차감
+    async pointDelete(userId: number){
+        const user = await this.userRepository.findOne({ where: {id: userId}});
+        if(!user) {
+            return { message: '유저정보 없음' };
+        }
+
+        if (user.point! < 100) {
+            return { message: '포인트 부족함' };
+        }
+
+        user.point! -= 100;
+        await this.userRepository.save(user);
+
+        return { message: '포인트 100 차감 완료' };
+    }
 }

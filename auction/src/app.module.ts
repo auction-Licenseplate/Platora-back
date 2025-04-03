@@ -7,18 +7,21 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PayModule } from './pay/pay.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
+import { AdminsModule } from './admins/admins.module';
+import { OpenaiModule } from './openai/openai.module';
 
 import { Users } from './entities/users.entity';
 import { UserCheck } from './entities/user_check';
 import { Vehicles } from './entities/vehicles';
 import { Grades } from './entities/grades';
 import { Auctions } from './entities/auctions';
-import { Bids } from './entities/bids';
 import { Payment } from './entities/payment';
 import { Favorites } from './entities/favorites';
 import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
-import { AdminsModule } from './admins/admins.module';
+import { Role } from './entities/role';
+import { BoardsModule } from './boards/boards.module';
+import { NotificationModule } from './notification/notification.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -43,11 +46,11 @@ import { AdminsModule } from './admins/admins.module';
         Vehicles,
         Grades,
         Auctions,
-        Bids,
         Payment,
         Favorites,
         Admins,
         Notifications,
+        Role
       ],
       charset: 'utf8mb4',
       synchronize: process.env.NODE_ENV !== 'production', // 개발 환경에서만 true
@@ -56,7 +59,10 @@ import { AdminsModule } from './admins/admins.module';
     AuthModule,
     PayModule,
     VehiclesModule,
-    AdminsModule
+    AdminsModule,
+    OpenaiModule,
+    BoardsModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService],

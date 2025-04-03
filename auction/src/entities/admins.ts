@@ -28,6 +28,9 @@ export class Admins {
     @Column({ type: 'enum', enum: ['approved', 'rejected'], default: 'rejected' })
     approval_status: string;
 
+    @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
+    write_status: string;
+
     @CreateDateColumn({ type: 'timestamp' }) 
     approved_at: Date;
 }

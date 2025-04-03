@@ -20,10 +20,4 @@ export class Vehicles {
 
     @Column('varchar', {comment:'번호판 번호', nullable: true})
     plate_num?: string;
-
-    @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
-    ownership_status: string;
-
-    @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
-    write_status: string;
 }

@@ -8,23 +8,17 @@ export class Auctions {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column('varchar', {comment:'경매 랜덤번호', unique: true })
+    auction_num: string;
+
     @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: "CASCADE" })
     user: Users;
 
     @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, { cascade: true, onDelete: "CASCADE" })
     vehicle: Vehicles;
-
-    @Column('varchar', {comment:'제목', nullable: true})
-    title: string;
-
-    @Column('text', {comment:'경매 이미지', nullable: true})
-    car_img: string;
     
     @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: "CASCADE" })
     grade_id: Grades;
-
-    @ManyToOne(() => Grades, (grade) => grade.min_price)
-    grade_price: Grades;
     
     @Column({ type: 'timestamp' }) 
     start_time: Date;
@@ -32,6 +26,6 @@ export class Auctions {
     @Column({ type: 'timestamp' })
     end_time: Date;
 
-    @Column({ type: 'enum', enum: ['going', 'completed'], default: 'going' })
+    @Column({ type: 'enum', enum: ['before', 'going', 'completed'], default: 'going' })
     status: string;
 }
