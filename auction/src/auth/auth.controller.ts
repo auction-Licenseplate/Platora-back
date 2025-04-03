@@ -52,7 +52,7 @@ export class AuthController {
     });
 
     // 로그인 성공 응답
-    return res.json({ message: '로그인 성공', id, email });
+    return res.json({ message: '로그인 성공', id, email, token });
   }
 
   // 쿠키에서 토큰 꺼내기
@@ -122,7 +122,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
-    return res.json({ user });
+    return res.json({ user, token });
   }
 
   // 아이디 찾기
