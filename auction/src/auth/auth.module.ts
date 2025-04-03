@@ -19,11 +19,18 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecret',  // JWT 비밀 키 설정
-      signOptions: { expiresIn: '24h' },  // JWT 만료 시간 설정
+      secret: process.env.JWT_SECRET || 'defaultSecret', // JWT 비밀 키 설정
+      signOptions: { expiresIn: '24h' }, // JWT 만료 시간 설정
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, KakaoStrategy, NaverStrategy, GoogleStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    KakaoStrategy,
+    NaverStrategy,
+    GoogleStrategy,
+  ],
   controllers: [AuthController],
   exports: [AuthService, JwtStrategy],
 })

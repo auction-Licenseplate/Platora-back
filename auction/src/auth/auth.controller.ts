@@ -1,7 +1,18 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -46,11 +57,11 @@ export class AuthController {
 
   // 쿠키에서 토큰 꺼내기
   @Get('/tokenCheck')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   async tokenCheck(@Req() req: Request) {
     // console.log("req.user 정보:", req.user);
     if (!req.cookies || !req.cookies.accessToken) {
-      throw new UnauthorizedException('쿠키가 없음');
+      return { isAuthenticated: false, message: '토큰 없음' };
     }
     return { message: '로그인 유지됨', token: req.user };
   }
@@ -153,15 +164,15 @@ export class AuthController {
 
   // 이메일, 번호 중복검사
   @Post('/check/:type')
-  async duplicateData(@Param('type') type: string, @Body() body){
+  async duplicateData(@Param('type') type: string, @Body() body) {
     const { email, phone } = body;
 
     let valueToCheck;
 
-    if(type === 'email'){
+    if (type === 'email') {
       valueToCheck = email;
     }
-    if(type === 'phone'){
+    if (type === 'phone') {
       valueToCheck = phone;
     }
 
