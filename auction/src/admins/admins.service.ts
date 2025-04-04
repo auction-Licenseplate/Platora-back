@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users.entity';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
-import { Vehicles } from 'src/entities/vehicles';
 import { Payment } from 'src/entities/payment';
 @Injectable()
 export class AdminsService {

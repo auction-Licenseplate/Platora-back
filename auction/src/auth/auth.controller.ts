@@ -182,7 +182,7 @@ export class AuthController {
   // 소셜로그인 번호 중복검사
   @Post('/phoneCheck')
   async socialDuplicate(@Body() body){
-    const { valueToCheck } = body;
+    const valueToCheck = body;
     return this.authService.socialDuplicateCheck(valueToCheck);
   }
 }

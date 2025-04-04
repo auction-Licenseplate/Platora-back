@@ -311,8 +311,8 @@ export class AuthService {
   }
 
   // 소셜로그인 번호 중복검사
-  async socialDuplicateCheck(valueToCheck: string){
-    const user = await this.userRepository.findOne({ where: {phone: valueToCheck}});
+  async socialDuplicateCheck(valueToCheck: {phone: string}){
+    const user = await this.userRepository.findOne({ where: {phone: valueToCheck.phone}});
     return {message: '사용 가능', exists: !!user};
   }
 }

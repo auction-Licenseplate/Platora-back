@@ -9,6 +9,8 @@ import { PayModule } from './pay/pay.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { AdminsModule } from './admins/admins.module';
 import { OpenaiModule } from './openai/openai.module';
+import { BoardsModule } from './boards/boards.module';
+import { NotificationModule } from './notification/notification.module';
 
 import { Users } from './entities/users.entity';
 import { UserCheck } from './entities/user_check';
@@ -20,8 +22,8 @@ import { Favorites } from './entities/favorites';
 import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
 import { Role } from './entities/role';
-import { BoardsModule } from './boards/boards.module';
-import { NotificationModule } from './notification/notification.module';
+import { Bids } from './entities/bids';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,7 +52,8 @@ import { NotificationModule } from './notification/notification.module';
         Favorites,
         Admins,
         Notifications,
-        Role
+        Role,
+        Bids
       ],
       charset: 'utf8mb4',
       synchronize: process.env.NODE_ENV !== 'production', // 개발 환경에서만 true
@@ -62,7 +65,7 @@ import { NotificationModule } from './notification/notification.module';
     AdminsModule,
     OpenaiModule,
     BoardsModule,
-    NotificationModule
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

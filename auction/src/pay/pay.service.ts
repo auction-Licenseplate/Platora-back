@@ -84,6 +84,7 @@ export class PayService {
 
     // 사용자 포인트 차감
     async pointDelete(userId: number){
+        console.log('차감될예정임')
         const user = await this.userRepository.findOne({ where: {id: userId}});
         if(!user) {
             return { message: '유저정보 없음' };
