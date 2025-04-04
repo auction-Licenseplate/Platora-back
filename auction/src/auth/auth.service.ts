@@ -57,6 +57,7 @@ export class AuthService {
       secret: secretKey,
       expiresIn: '1d',
     });
+    console.log(newToken);
     // console.log("새로 발급된 토큰:", newToken);
     return { id: user.id, email: user.email, token: newToken };
   }

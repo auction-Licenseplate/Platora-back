@@ -42,6 +42,7 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   async login(@Req() req: any, @Res() res: any) {
     const { id, email, token } = req.user;
+    console.log(token);
     if (!token) {
       return { message: '로그인 실패' };
     }
