@@ -42,6 +42,7 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   async login(@Req() req: any, @Res() res: any) {
     const { id, email, token } = req.user;
+    console.log(token);
     if (!token) {
       return { message: '로그인 실패' };
     }
@@ -181,7 +182,7 @@ export class AuthController {
 
   // 소셜로그인 번호 중복검사
   @Post('/phoneCheck')
-  async socialDuplicate(@Body() body){
+  async socialDuplicate(@Body() body) {
     const { valueToCheck } = body;
     return this.authService.socialDuplicateCheck(valueToCheck);
   }

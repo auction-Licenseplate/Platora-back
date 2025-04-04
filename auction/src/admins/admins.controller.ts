@@ -6,7 +6,15 @@ export class AdminsController {
   constructor(private readonly adminService: AdminsService) {}
 
   @Get('/userinfo')
-  async userinfo(@Body() body: { email: string; password: string; name: string; phone: string; }) {
+  async userinfo(
+    @Body()
+    body: {
+      email: string;
+      password: string;
+      name: string;
+      phone: string;
+    },
+  ) {
     return this.adminService.userinfo();
   }
 
@@ -19,10 +27,15 @@ export class AdminsController {
     console.log('🔍 getReturPoint() 실행됨'); // 실행 여부 확인
     return this.adminService.returnpoint();
   }
+  @Post('/pendding')
+  async postpendding(@Body() body: { userId: number }) {
+    console.log('🔍 getReturPoint() 실행됨'); // 실행 여부 확인
+    return this.adminService.pendding(body.userId);
+  }
 
   @Get('/getStatus')
   @UseGuards(JwtAuthGuard)
-  async userCarStatus(@Req() req){
+  async userCarStatus(@Req() req) {
     const userId = req.user.id;
     return await this.adminService.carOwnership(userId);
   }

@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users.entity';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
-import { Vehicles } from 'src/entities/vehicles';
 import { Payment } from 'src/entities/payment';
 @Injectable()
 export class AdminsService {
@@ -28,15 +27,16 @@ export class AdminsService {
 
     return { userInfo };
   }
-  // 공동인증서 승인
+  // 공동인증서 데이터
   async fileinfo() {
     return this.vehicleRepository
       .createQueryBuilder('v')
-      .select(['u.name', 'u.certification', 'v.plate_num', 'u.email'])
+      .select(['u.name', 'u.certification', 'v.plate_num', 'u.email', 'u.id'])
       .innerJoin('v.user', 'u')
       .where('v.ownership_status = :status', { status: 'waiting' })
       .getRawMany();
   }
+  // 포인트 반환 승인
   async returnpoint() {
     const rawData = await this.paymentRepository
       .createQueryBuilder('p')
@@ -63,12 +63,24 @@ export class AdminsService {
 
     return formattedData;
   }
+  //공동인증서 승인
+  async pendding(userId: number) {
+    // 승인 상태 업데이트
+    const userInfo1 = await this.vehicleRepository.update(
+      { user: { id: userId }, ownership_status: 'waiting' }, // 조건
+      { ownership_status: 'pending' }, // 변경할 값
+    );
+
+    return { userInfo1 };
+  }
 
   // 사용자 차량승인 상태 전달
-  async carOwnership(userId: number){
-    const vehicle = await this.vehicleRepository.findOne({ where: {user: {id:userId}}});
-    if(!vehicle){
-      return {message: '차량정보 없음'};
+  async carOwnership(userId: number) {
+    const vehicle = await this.vehicleRepository.findOne({
+      where: { user: { id: userId } },
+    });
+    if (!vehicle) {
+      return { message: '차량정보 없음' };
     }
 
     console.log('차량상태', vehicle.ownership_status);

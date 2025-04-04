@@ -57,6 +57,7 @@ export class AuthService {
       secret: secretKey,
       expiresIn: '1d',
     });
+    console.log(newToken);
     // console.log("새로 발급된 토큰:", newToken);
     return { id: user.id, email: user.email, token: newToken };
   }
@@ -311,8 +312,10 @@ export class AuthService {
   }
 
   // 소셜로그인 번호 중복검사
-  async socialDuplicateCheck(valueToCheck: string){
-    const user = await this.userRepository.findOne({ where: {phone: valueToCheck}});
-    return {message: '사용 가능', exists: !!user};
+  async socialDuplicateCheck(valueToCheck: string) {
+    const user = await this.userRepository.findOne({
+      where: { phone: valueToCheck },
+    });
+    return { message: '사용 가능', exists: !!user };
   }
 }
