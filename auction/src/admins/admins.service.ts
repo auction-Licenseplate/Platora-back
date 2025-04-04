@@ -27,6 +27,7 @@ export class AdminsService {
 
     return { userInfo };
   }
+
   // 공동인증서 데이터
   async fileinfo() {
     return this.vehicleRepository
@@ -36,6 +37,7 @@ export class AdminsService {
       .where('v.ownership_status = :status', { status: 'waiting' })
       .getRawMany();
   }
+
   // 포인트 반환 승인
   async returnpoint() {
     const rawData = await this.paymentRepository
@@ -60,9 +62,9 @@ export class AdminsService {
     }));
 
     console.log('가공된 데이터:', formattedData); // 가공된 데이터 확인
-
     return formattedData;
   }
+  
   //공동인증서 승인
   async pendding(userId: number) {
     // 승인 상태 업데이트

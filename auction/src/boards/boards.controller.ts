@@ -1,14 +1,39 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { BoardsService } from './boards.service';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller('boards')
 export class BoardsController {
     constructor(private readonly boardService: BoardsService) {}
 
-    // 필요한 정보 : 판매자명(users.id), 제목(vehicles.id), 등급(grades.id), final_price, end_time, status
+    // 모든 경매 목록 전달
     @Post('/getAllProduct')
-    async allInfo(@Body() body){
-        console.log(body, '화긴용')
-        return await this.boardService.getAllInfo(body);
+    async allInfo(){
+        return await this.boardService.getAllInfo();
     }
+
+    // 승인 전
+    @Get('/getMyPosts')
+    @UseGuards(JwtAuthGuard)
+    async getNo(@Query() query, @Req() req){
+        const userId = req.user.id;
+        return await this.boardService.getMyPots(userId, query);
+    }
+
+    // 승인 후
+    @Get('/getPosts')
+    @UseGuards(JwtAuthGuard)
+    async getYes(@Query() query, @Req() req){
+        const userId = req.user.id;
+        return await this.boardService.getPosts(userId, query);
+    }
+
+    // 관심상품
+    @Get('/getMyFavorites')
+    @UseGuards(JwtAuthGuard)
+    async getFavorite(@Req() req){
+        const userId = req.user.id;
+        return await this.boardService.getfavorite(userId);
+    }
+
 }
