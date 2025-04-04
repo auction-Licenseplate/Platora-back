@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Grades } from 'src/entities/grades';
 import { UserCheck } from 'src/entities/user_check';
 import { Users } from 'src/entities/users.entity';
 import { Vehicles } from 'src/entities/vehicles';
@@ -14,6 +15,8 @@ export class UsersService {
     private vehicleRepository: Repository<Vehicles>,
     @InjectRepository(UserCheck)
     private userCheckRepository: Repository<UserCheck>,
+    @InjectRepository(Grades)
+    private gradeRepository: Repository<Grades>
   ) {}
 
   // 마이페이지 정보 제공
@@ -59,24 +62,33 @@ export class UsersService {
 
   // 공인인증서 db 저장
   async saveFile(userId: number, body: any, file: Express.Multer.File) {
-    const filename = file.filename;
-    console.log('파일 경로:', filename); // filePath 확인
     console.log(body.grade, body.score, body.price);
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       return { message: '유저정보 없음' };
     }
 
-    user.certification = filename; // users에 공인인증서 저장
+    // users에 공인인증서 저장
+    const filename = file.filename;
+    user.certification = filename; 
     await this.userRepository.save(user);
 
-    const plateNum = body.vehicleNumber; // vehicle에 차량번호 저장
+    // vehicle에 차량번호 저장
+    const plateNum = body.vehicleNumber; 
     const vehicle = this.vehicleRepository.create({
       user,
       plate_num: plateNum,
     });
     await this.vehicleRepository.save(vehicle);
 
-    return { message: '인증 업로드 성공' };
+    // grade에 데이터 저장
+    const newGrade = this.gradeRepository.create({
+      grade_name: body.grade,
+      price_unit: Number(body.score),
+      min_price: Number(body.price)
+    })
+    await this.gradeRepository.save(newGrade);
+
+    return { message: '인증 업로드 및 등급저장 성공' };
   }
 }
