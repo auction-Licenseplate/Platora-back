@@ -68,7 +68,7 @@ export class AdminsService {
     // 승인 상태 업데이트
     const userInfo1 = await this.vehicleRepository.update(
       { user: { id: userId }, ownership_status: 'waiting' }, // 조건
-      { ownership_status: 'pending' }, // 변경할 값
+      { ownership_status: 'success' }, // 변경할 값
     );
 
     return { userInfo1 };
