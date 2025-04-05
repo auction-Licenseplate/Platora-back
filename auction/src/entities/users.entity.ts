@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Vehicles } from './vehicles';
+import { Auctions } from './auctions';
 @Entity('users') // 테이블 이름
 export class Users {
   @PrimaryGeneratedColumn({type:'int', comment:'고유 사용자ID'})

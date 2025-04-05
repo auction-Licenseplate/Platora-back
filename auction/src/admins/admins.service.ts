@@ -4,6 +4,7 @@ import { Users } from 'src/entities/users.entity';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
 import { Payment } from 'src/entities/payment';
+import { Admins } from 'src/entities/admins';
 @Injectable()
 export class AdminsService {
   constructor(
@@ -13,6 +14,8 @@ export class AdminsService {
     private vehicleRepository: Repository<Vehicles>,
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
+    @InjectRepository(Admins)
+    private adminRepository: Repository<Admins>
   ) {}
 
   // 회원 관리
@@ -76,7 +79,33 @@ export class AdminsService {
     return { userInfo1 };
   }
 
-  // 사용자 차량승인 상태 전달
+  // 배너 이미지 전달
+  async bannerGet() {
+    return await this.adminRepository.find({
+      select: ['title', 'img']
+    });
+  }
+
+  // 경매 물품 전달
+  async itemInfo(){
+    return await this.vehicleRepository
+      .createQueryBuilder('v')
+      .select(['v.title','v.car_img', 'v.plate_num', 'u.email', 'u.id', 'u.name'])
+      .innerJoin('v.user', 'u')
+      .getRawMany();
+  }
+
+  // 회원탈퇴
+  async userDelete(email: string){
+    const user = await this.userRepository.findOne({where: {email}});
+    if(!user){
+      return {message: '사용자 없음'}
+    }
+    await this.userRepository.remove(user);
+    return { message: '사용자 탈퇴 완료'};
+  }
+
+  // 사용자 차량승인 상태 전달 (프론트)
   async carOwnership(userId: number) {
     const vehicle = await this.vehicleRepository.findOne({
       where: { user: { id: userId } },

@@ -19,15 +19,12 @@ export class Admins {
     @Column('varchar', {comment: '배너 이미지', nullable: true})
     img: string;
 
-    @Column('timestamp', {comment:'경매시작 날짜'})
+    @Column('timestamp', {comment:'경매시작 날짜', nullable: true})
     auction_start: Date;
 
-    @Column('timestamp', {comment:'경매끝나는 날짜'})
+    @Column('timestamp', {comment:'경매끝나는 날짜', nullable: true})
     auction_end: Date;
 
     @Column('enum', {enum: ['approved', 'pending'], default: 'pending' })
     write_status: string;
-
-    @CreateDateColumn({ type: 'timestamp' }) 
-    approved_at: Date;
 }
