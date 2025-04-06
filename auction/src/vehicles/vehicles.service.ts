@@ -23,8 +23,11 @@ export class VehiclesService {
   async saveCarImg(userId: number, body: any, files: Express.Multer.File[]) {
     // 파일 이름으로 저장 (쉼표 구분)
     const filename = files.map((file) => file.filename).join(',');
-    let vehicle = await this.vehicleRepository.findOne({
-      where: { user: { id: userId }, plate_num: body.plate_num },
+    const vehicle = await this.vehicleRepository.findOne({
+      where: {
+        plate_num: body.plate_num,
+        ownership_status: 'approved',
+      },
     });
 
     // 기존 차량 정보 업데이트
@@ -34,5 +37,17 @@ export class VehiclesService {
 
     await this.vehicleRepository.save(vehicle!);
     return { message: '작성글 저장완료', vehicle };
+  }
+
+  // 등록 시 번호판 승인 여부 검사
+  async checkIfPlateIsApproved(plate_num: string): Promise<boolean> {
+    const existing = await this.vehicleRepository.findOne({
+      where: {
+        plate_num,
+        ownership_status: 'approved',
+      },
+    });
+
+    return !!existing;
   }
 }

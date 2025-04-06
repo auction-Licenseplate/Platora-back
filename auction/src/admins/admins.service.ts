@@ -15,7 +15,7 @@ export class AdminsService {
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
     @InjectRepository(Admins)
-    private adminRepository: Repository<Admins>
+    private adminRepository: Repository<Admins>,
   ) {}
 
   // 회원 관리
@@ -67,13 +67,13 @@ export class AdminsService {
     console.log('가공된 데이터:', formattedData); // 가공된 데이터 확인
     return formattedData;
   }
-  
+
   //공동인증서 승인
   async pendding(userId: number) {
     // 승인 상태 업데이트
     const userInfo1 = await this.vehicleRepository.update(
       { user: { id: userId }, ownership_status: 'waiting' }, // 조건
-      { ownership_status: 'success' }, // 변경할 값
+      { ownership_status: 'approved' }, // 변경할 값
     );
 
     return { userInfo1 };
@@ -82,39 +82,55 @@ export class AdminsService {
   // 배너 이미지 전달
   async bannerGet() {
     return await this.adminRepository.find({
-      select: ['title', 'img']
+      select: ['title', 'img'],
     });
   }
 
   // 경매 물품 전달
-  async itemInfo(){
+  async itemInfo() {
     return await this.vehicleRepository
       .createQueryBuilder('v')
-      .select(['v.title','v.car_img', 'v.plate_num', 'u.email', 'u.id', 'u.name'])
+      .select([
+        'v.title',
+        'v.car_img',
+        'v.plate_num',
+        'u.email',
+        'u.id',
+        'u.name',
+      ])
       .innerJoin('v.user', 'u')
       .getRawMany();
   }
 
   // 회원탈퇴
-  async userDelete(email: string){
-    const user = await this.userRepository.findOne({where: {email}});
-    if(!user){
-      return {message: '사용자 없음'}
+  async userDelete(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      return { message: '사용자 없음' };
     }
     await this.userRepository.remove(user);
-    return { message: '사용자 탈퇴 완료'};
+    return { message: '사용자 탈퇴 완료' };
   }
 
   // 사용자 차량승인 상태 전달 (프론트)
   async carOwnership(userId: number) {
-    const vehicle = await this.vehicleRepository.findOne({
+    const vehicles = await this.vehicleRepository.find({
       where: { user: { id: userId } },
     });
-    if (!vehicle) {
+
+    if (!vehicles || vehicles.length === 0) {
       return { message: '차량정보 없음' };
     }
 
-    console.log('차량상태', vehicle.ownership_status);
-    return vehicle.ownership_status;
+    const approvedVehicle = vehicles.find(
+      (vehicle) => vehicle.ownership_status === 'approved',
+    );
+
+    if (approvedVehicle) {
+      console.log('차량상태', approvedVehicle.ownership_status);
+      return approvedVehicle.ownership_status;
+    }
+
+    return { message: '승인된 차량 없음' };
   }
 }

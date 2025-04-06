@@ -11,6 +11,8 @@ import { AdminsModule } from './admins/admins.module';
 import { OpenaiModule } from './openai/openai.module';
 import { BoardsModule } from './boards/boards.module';
 import { NotificationModule } from './notification/notification.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 import { Users } from './entities/users.entity';
 import { UserCheck } from './entities/user_check';
@@ -53,11 +55,17 @@ import { Bids } from './entities/bids';
         Admins,
         Notifications,
         Role,
-        Bids
+        Bids,
       ],
       charset: 'utf8mb4',
       synchronize: process.env.NODE_ENV !== 'production', // 개발 환경에서만 true
     }),
+
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+
     UsersModule,
     AuthModule,
     PayModule,
@@ -67,6 +75,7 @@ import { Bids } from './entities/bids';
     BoardsModule,
     NotificationModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })

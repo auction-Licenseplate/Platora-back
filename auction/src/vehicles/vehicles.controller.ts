@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   Body,
+  Query,
 } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
@@ -51,5 +52,13 @@ export class VehiclesController {
 
     const userId = req.user.id;
     return await this.vehicleService.saveCarImg(userId, body, files);
+  }
+
+  // 등록 시 번호판 승인 여부 검사
+  @Get('/checkApprovedPlate')
+  @UseGuards(JwtAuthGuard)
+  async checkApprovedPlate(@Query('plate') plate: string) {
+    const exists = await this.vehicleService.checkIfPlateIsApproved(plate);
+    return { exists };
   }
 }
