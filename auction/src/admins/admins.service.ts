@@ -17,8 +17,6 @@ export class AdminsService {
     private paymentRepository: Repository<Payment>,
     @InjectRepository(Admins)
     private adminRepository: Repository<Admins>,
-    @InjectRepository(Auctions)
-    private auctionRepository: Repository<Auctions>
   ) {}
 
   // 회원 관리
@@ -129,31 +127,6 @@ export class AdminsService {
     }
     await this.userRepository.remove(user);
     return { message: '사용자 탈퇴 완료' };
-  }
-
-  // 상세페이지 전달
-  async getDetailInfo(auctionId: number){
-    const auction = await this.auctionRepository
-      .createQueryBuilder('au')
-      .innerJoin('au.user', 'registerUser') // 등록한 사람
-      .innerJoin('au.vehicle', 'vehicle')
-      .innerJoin('au.bids', 'bid')
-      .innerJoin('bid.user', 'bidUser') // 입찰한 사람
-      .where('au.id = :auctionId', {auctionId})
-      .select([
-        'au.final_price',
-        'au.end_time',
-        'au.auction_num',
-        'registerUser.name',
-        'vehicle.car_info',
-        'vehicle.car_img',
-        'bid.bid_count',
-        'bid.create_at',
-        'bidUser.name'
-      ])
-      .getRawMany();
-
-      return auction;
   }
 
   // 사용자 차량승인 상태 전달 (프론트)

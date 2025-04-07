@@ -52,7 +52,7 @@ export class VehiclesService {
 
     const existingWrite = await this.vehicleRepository.findOne({
       where: {
-        title: plate_num,
+        title: plate_num, // title이랑 plate_num이 같을 경우를 찾아 보내주기
       },
     });
 

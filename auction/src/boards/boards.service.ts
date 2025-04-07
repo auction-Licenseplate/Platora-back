@@ -104,4 +104,28 @@ export class BoardsService {
       .where('favUser.id = :userId', { userId }) // 해당 유저의 데이터만
       .getRawMany();
   }
+
+  // 상세페이지 전달
+  async getDetailInfo(auctionId: number){
+    return await this.auctionRepository
+      .createQueryBuilder('au')
+      .innerJoin('au.user', 'registerUser') // 등록한 사람
+      .innerJoin('au.vehicle', 'vehicle')
+      .innerJoin('au.bids', 'bid')
+      .innerJoin('bid.user', 'bidUser') // 입찰한 사람
+      .where('au.id = :auctionId', {auctionId})
+      .select([
+        'au.final_price',
+        'au.end_time',
+        'au.auction_num',
+        'registerUser.name',
+        'vehicle.car_info',
+        'vehicle.car_img',
+        'bid.bid_count',
+        'bid.create_at',
+        'bidUser.name'
+      ])
+      .getRawMany();
+  }
+
 }
