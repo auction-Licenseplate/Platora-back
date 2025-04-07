@@ -37,12 +37,12 @@ export class BoardsService {
 
   // 승인 전 제공
   async getMyPots(userId: string, query: any) {
-    return await this.vehicleRepository
-      .createQueryBuilder('vehicle')
-      .leftJoinAndSelect('vehicle.user', 'user')
-      .leftJoin('vehicle.auctions', 'auction')
-      .leftJoin('auction.admins', 'admin')
-      .leftJoinAndSelect('vehicle.grades', 'grade')
+    return await this.auctionRepository
+      .createQueryBuilder('auction')
+      .innerJoin('auction.vehicle', 'vehicle')
+      .innerJoin('auction.grade', 'grade')
+      .innerJoin('auction.user', 'user')
+      .innerJoin('auction.admins', 'admin')
       .select([
         'vehicle.title AS vehicleTitle', // 차량 제목
         'vehicle.car_img AS carImage', // 차량 이미지
@@ -58,11 +58,13 @@ export class BoardsService {
 
   // 승인 후 제공
   async getPosts(userId: string, query: any) {
+    const statusArray = query.status ?? query['status[]'] ?? []; // status[] 고려
+
     return await this.auctionRepository
       .createQueryBuilder('auction')
-      .leftJoinAndSelect('auction.user', 'user')
-      .leftJoinAndSelect('auction.vehicle', 'vehicle')
-      .leftJoinAndSelect('auction.grade_id', 'grade')
+      .innerJoin('auction.user', 'user')
+      .innerJoin('auction.vehicle', 'vehicle')
+      .innerJoin('auction.grade', 'grade')
       .select([
         'auction.auction_num AS auctionNum', // 경매 번호
         'user.name AS userName', // 판매자명
@@ -72,8 +74,8 @@ export class BoardsService {
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태
       ])
-      .where('user.id = :userId', { userId }) // 해당 유저의 데이터만
-      .andWhere('auction.status IN (:...status)', { status: query.status }) // status 조건 적용
+      .where('user.id = :userId', { userId }) // 해당 유저의 데이터
+      .andWhere('auction.status IN (:...status)', { status: statusArray }) // status 조건 적용
       .getRawMany();
   }
 
@@ -81,10 +83,10 @@ export class BoardsService {
   async getfavorite(userId: string) {
     return await this.favoriteRepository
       .createQueryBuilder('favorite')
-      .leftJoinAndSelect('favorite.auction', 'auction')
-      .leftJoinAndSelect('auction.user', 'user')
-      .leftJoinAndSelect('auction.vehicle', 'vehicle')
-      .leftJoinAndSelect('auction.grade_id', 'grade')
+      .innerJoin('favorite.auction', 'auction')
+      .innerJoin('auction.user', 'user')
+      .innerJoin('auction.vehicle', 'vehicle')
+      .innerJoin('auction.grade', 'grade')
       .select([
         'user.name AS userName', // 판매자명
         'vehicle.title AS vehicleTitle', // 차량 제목

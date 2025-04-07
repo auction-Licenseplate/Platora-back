@@ -30,6 +30,10 @@ export class AdminsController {
   async banner(){
     return this.adminService.bannerGet();
   }
+  @Get('/contents')
+  async banner2(){
+    return this.adminService.bannerGet2();
+  }
 
   // 경매 물품 전달
   @Get('/iteminfo')
