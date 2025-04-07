@@ -36,4 +36,7 @@ export class Payment {
 
     @Column('int', {comment:'포인트 차감', nullable: true})
     point_minus: number;
+
+    @CreateDateColumn({ type: 'timestamp' }) 
+    create_at: Date;
 }

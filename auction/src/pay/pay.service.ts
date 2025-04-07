@@ -77,14 +77,13 @@ export class PayService {
     async pointData(userId: number){
         const payPoint = await this.payRepository.find({
             where: {user: {id: userId}},
-            select: ['amount', 'refund_amount', 'status', 'refund_status']
+            select: ['amount', 'refund_amount', 'status', 'refund_status', 'point_minus', 'create_at']
         })
         return { message: '포인트정보 전달 완료', payPoint} ;
     }
 
     // 사용자 포인트 차감
     async pointDelete(userId: number){
-        console.log('차감될예정임')
         const user = await this.userRepository.findOne({ where: {id: userId}});
         if(!user) {
             return { message: '유저정보 없음' };
@@ -95,7 +94,13 @@ export class PayService {
         }
 
         user.point! -= 100;
-        await this.userRepository.save(user);
+        await this.userRepository.save(user); // user 엔티티 차감
+
+        const minusPay = this.payRepository.create({
+            user: {id: userId},
+            point_minus: 100,
+        });
+        await this.payRepository.save(minusPay);
 
         return { message: '포인트 100 차감 완료' };
     }
