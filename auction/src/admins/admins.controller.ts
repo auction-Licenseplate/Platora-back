@@ -14,9 +14,16 @@ export class AdminsController {
   async getFileInfo() {
     return this.adminService.fileinfo();
   }
+
+  // 포인트 반환 리스트
   @Get('/return')
   async getReturPoint() {
     return this.adminService.returnpoint();
+  }
+  // 포인트 반환 승인
+  @Post('/pointsuccess')
+  async postRefundPoint(@Body() body: { userId: number }){
+    return this.adminService.approveRefund(body.userId);
   }
 
   // 공동인증서 승인
@@ -41,11 +48,11 @@ export class AdminsController {
     return this.adminService.itemInfo();
   }
 
-  // 경매 승인
+  // 경매 승인 (auction 테이블 저장)
   @Post('/iteminfo/sucess')
-  async postSucess(@Body() body: { userId: number, platenum: string }){
-    console.log(body, '확인해보자')
-    return this.adminService.success(body.userId, body.platenum);
+  async postSucess(@Body() body: { userid: number, platenum: string }){
+    console.log('경매요청어케되는거니', body)
+    return this.adminService.success(body.userid, body.platenum);
   }
 
   // 회원탈퇴

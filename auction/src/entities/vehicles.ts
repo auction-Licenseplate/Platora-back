@@ -14,11 +14,11 @@ export class Vehicles {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Users, (user) => user.id, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: 'CASCADE'})
   user: Users;
+  
+  @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: 'CASCADE', nullable: true })
+  grade: Grades;
 
   @ManyToOne(() => Grades)
   @JoinColumn({ name: 'grade_id' })

@@ -33,6 +33,7 @@ export class VehiclesService {
       where: {
         plate_num: body.title,
         ownership_status: 'approved',
+        user: { id: userId },
       },
       relations: ['grade'],
     });
@@ -55,6 +56,7 @@ export class VehiclesService {
         vehicle: { id: vehicle.id },
         user: { id: userId },
       },
+      relations: ['user'],
     });
 
     if (adminEntry) {

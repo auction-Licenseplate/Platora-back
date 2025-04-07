@@ -92,6 +92,19 @@ export class UsersService {
     });
     await this.vehicleRepository.save(vehicle);
 
+    //   min_price: Number(body.price)
+    // })
+    // const savedGrade = await this.gradeRepository.save(newGrade);
+
+    // // vehicle에 차량번호 저장
+    // const plateNum = body.vehicleNumber;
+    // const vehicle = this.vehicleRepository.create({
+    //   user,
+    //   plate_num: plateNum,
+    //   grade: savedGrade
+    // });
+    // await this.vehicleRepository.save(vehicle);
+
     return { message: '인증 업로드 및 등급저장 성공' };
   }
 }
