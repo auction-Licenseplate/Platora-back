@@ -7,9 +7,9 @@ export class NotificationController {
 
     // 공인인증서 오류 이메일 전송
     @Post('/failvalue')
-        async sendEmail(@Body() body: { email: string; type: string }){
+        async sendEmail(@Body() body: { type: string, userId: number }){
         console.log('나타나라얍', body);
-        const {email, type} = body;
-    return this.notificationService.sendTypeEmail(email, type);
+        const {type, userId} = body;
+        return this.notificationService.sendTypeEmail(type, userId);
     }
 }

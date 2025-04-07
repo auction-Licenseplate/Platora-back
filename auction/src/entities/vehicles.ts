@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Users } from './users.entity';
 
 @Entity('vehicles')
@@ -29,4 +29,7 @@ export class Vehicles {
     default: 'waiting',
   })
   ownership_status: string; // 승인 상태 처음 waiting
+
+  @CreateDateColumn({ type: 'timestamp' }) 
+  create_at: Date;
 }

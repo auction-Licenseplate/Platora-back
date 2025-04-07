@@ -25,8 +25,8 @@ export class NotificationService {
         }
     })
 
-    // 공인인증서 오류 이메일 전송 (혹시이걸보게된다면 유저 구분하게 email도 보내주라........)
-    async sendTypeEmail(email: string, type: string){
+    // 공인인증서 오류 이메일 전송
+    async sendTypeEmail(type: string, userId: number){
         const failMessages = {
             '1': '공동인증서가 유효하지 않습니다.',
             '2': '제출된 정보가 부족합니다.',
@@ -34,7 +34,7 @@ export class NotificationService {
         };
 
         const message = failMessages[type] || '알 수 없는 거절 사유입니다.';
-        const user = await this.userRepository.findOne({ where: { email } });
+        const user = await this.userRepository.findOne({ where: {id: userId}});
         if(!user){
             return {message: '사용자 없음'}
         }
@@ -50,7 +50,7 @@ export class NotificationService {
         // 2. 이메일 전송
         await this.transporter.sendMail({
             from: `"관리자" <${process.env.GOOGLE_EMAIL_USER}>`,
-            to: email,
+            to: user.email,
             subject: '[공동인증서 거절 안내]',
             text: message,
         });

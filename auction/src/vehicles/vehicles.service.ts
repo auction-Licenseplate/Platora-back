@@ -15,7 +15,7 @@ export class VehiclesService {
   async getCarData(userId: number) {
     return this.vehicleRepository.find({
       where: { user: { id: userId } },
-      select: ['plate_num', 'ownership_status'],
+      select: ['plate_num', 'ownership_status', 'create_at'],
     });
   }
 
