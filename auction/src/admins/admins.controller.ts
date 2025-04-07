@@ -16,12 +16,12 @@ export class AdminsController {
   }
   @Get('/return')
   async getReturPoint() {
-    // console.log('🔍 getReturPoint() 실행됨'); // 실행 여부 확인
     return this.adminService.returnpoint();
   }
+
+  // 공동인증서 승인
   @Post('/pendding')
   async postpendding(@Body() body: { userId: number }) {
-    // console.log('🔍 getReturPoint() 실행됨'); // 실행 여부 확인
     return this.adminService.pendding(body.userId);
   }
 
@@ -39,6 +39,13 @@ export class AdminsController {
   @Get('/iteminfo')
   async auctionItem(){
     return this.adminService.itemInfo();
+  }
+
+  // 경매 승인
+  @Post('/iteminfo/sucess')
+  async postSucess(@Body() body: { userId: number, platenum: string }){
+    console.log(body, '확인해보자')
+    return this.adminService.success(body.userId, body.platenum);
   }
 
   // 회원탈퇴

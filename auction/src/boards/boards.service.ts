@@ -28,6 +28,7 @@ export class BoardsService {
         'vehicle.title AS vehicleTitle', // 차량 제목
         'vehicle.car_img AS imageUrl', // 차량 이미지
         'grade.grade_name AS gradeName', // 등급명
+        'auction.id As auctionID', // 경매 아이디 (PK)
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태

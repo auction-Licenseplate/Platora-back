@@ -108,6 +108,16 @@ export class AdminsService {
       .getRawMany();
   }
 
+  // 경매 승인 
+  async success(userId: number, platenum: string){
+    const writeStatus = await this.adminRepository.update(
+      {user: {id: userId}, write_status: 'pending'}, // 조건
+      {write_status: 'approved'} // 변경할 값d
+    )
+
+    return { writeStatus };
+  }
+
   // 회원탈퇴
   async userDelete(email: string) {
     const user = await this.userRepository.findOne({ where: { email } });

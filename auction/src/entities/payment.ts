@@ -33,4 +33,7 @@ export class Payment {
 
     @Column({ type: 'enum', enum: ['success', 'waiting'], default: 'waiting' })
     refund_status: string;
+
+    @Column('int', {comment:'포인트 차감', nullable: true})
+    point_minus: number;
 }
