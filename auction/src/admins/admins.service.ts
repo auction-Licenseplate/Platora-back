@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Payment } from 'src/entities/payment';
 import { Admins } from 'src/entities/admins';
 import { Auctions } from 'src/entities/auctions';
+import { Grades } from 'src/entities/grades';
 @Injectable()
 export class AdminsService {
   constructor(
@@ -17,6 +18,10 @@ export class AdminsService {
     private paymentRepository: Repository<Payment>,
     @InjectRepository(Admins)
     private adminRepository: Repository<Admins>,
+    @InjectRepository(Auctions)
+    private auctionRepository: Repository<Auctions>,
+    @InjectRepository(Grades)
+    private gradeRepository: Repository<Grades>
   ) {}
 
   // 회원 관리
@@ -42,11 +47,12 @@ export class AdminsService {
       .getRawMany();
   }
 
-  // 포인트 반환 승인
+  // 포인트 반환
   async returnpoint() {
     const rawData = await this.paymentRepository
       .createQueryBuilder('p')
       .select([
+        'u.id AS id',
         'u.name AS name',
         'u.email AS email',
         'p.account AS account',
@@ -58,6 +64,7 @@ export class AdminsService {
       .getRawMany();
 
     const formattedData = rawData.map((data) => ({
+      userId: data.id,
       name: data.name || '이름 없음',
       email: data.email || '이메일 없음',
       account: data.account || '계좌 정보 없음',
@@ -65,8 +72,33 @@ export class AdminsService {
       amount: data.refundAmount || 0,
     }));
 
-    console.log('가공된 데이터:', formattedData); // 가공된 데이터 확인
+    // console.log('가공된 데이터:', formattedData); // 가공된 데이터 확인
     return formattedData;
+  }
+
+  // 포인트 반환 승인
+  async approveRefund(userId: number){
+    // const payment = await this.paymentRepository.findOne({
+    //   where: {
+    //     user: {id: userId},
+    //     refund_status: 'waiting',
+    //   },
+    //   relations: ['user'],
+    // });
+
+    // if(!payment){
+    //   return { message: '해당 유저 환불대기 내역 없음' };
+    // }
+
+    // payment.refund_status = 'success'; // 환불상태 변경
+    // await this.paymentRepository.save(payment);
+
+    // const user = payment.user; // 해당 유저포인트에 환불금액 추가
+    // console.log(user, '환불됨?')
+    // user.point = (user.point || 0) + (payment.refund_amount || 0);
+    // await this.userRepository.save(user);
+    
+    // return { message: '환불 승인 완료'};
   }
 
   //공동인증서 승인
@@ -110,13 +142,72 @@ export class AdminsService {
   }
 
   // 경매 승인 
-  async success(userId: number, platenum: string){
-    const writeStatus = await this.adminRepository.update(
-      {user: {id: userId}, write_status: 'pending'}, // 조건
-      {write_status: 'approved'} // 변경할 값
-    )
+  async success(userId: number, plateNum: string){
+    // 경매번호 랜덤생성
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let rnadomAuction = 'AUC-';
+    for (let i = 0; i < 8; i++) {
+      rnadomAuction += chars[Math.floor(Math.random() * chars.length)];
+    }
 
-    return { writeStatus };
+    // 1. 유저와 차량 데이터 조회
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const vehicle = await this.vehicleRepository.findOne({
+      where: { plate_num: plateNum },
+      relations: ['grade'],
+    });
+    const grade = vehicle?.grade;
+    
+    if (!user || !vehicle) {
+      return {message: '유저랑 차량 확인 불가능'}
+    }
+
+    // 2. Admins에 레코드 삽입
+    let adminRecord = await this.adminRepository.findOne({
+      where: {
+        user: { id: user.id },
+        vehicle: { id: vehicle.id },
+        write_status: 'pending',
+      },
+      relations: ['user', 'vehicle'],
+    });
+    
+    if (adminRecord) { // 있으면 상태만 변경
+      adminRecord.write_status = 'approved';
+    } else { // 없으면 새로 생성
+      adminRecord = this.adminRepository.create({
+        user,
+        vehicle,
+        write_status: 'approved',
+      });
+    }
+
+    await this.adminRepository.save(adminRecord);
+
+    // 3. auctions에 레코드 삽입
+    let auctionRecord = await this.auctionRepository.findOne({
+      where: {
+        user: { id: user.id },
+        vehicle: { id: vehicle.id },
+        status: 'before', // 아직 시작 안 된 경매만
+      },
+      relations: ['user', 'vehicle'],
+    });
+
+    if (!auctionRecord) { // 기존 경매 없으면 새로 생성
+      auctionRecord = this.auctionRepository.create({
+        user,
+        vehicle,
+        grade,
+        auction_num: rnadomAuction,
+        start_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3일 후
+        end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5), // 5일 후
+        status: 'before',
+      });
+
+      await this.auctionRepository.save(auctionRecord);
+    }
+    return { message: '경매 승인 성공' };
   }
 
   // 회원탈퇴
@@ -144,7 +235,7 @@ export class AdminsService {
     );
 
     if (approvedVehicle) {
-      console.log('차량상태', approvedVehicle.ownership_status);
+      // console.log('차량상태', approvedVehicle.ownership_status);
       return approvedVehicle.ownership_status;
     }
 

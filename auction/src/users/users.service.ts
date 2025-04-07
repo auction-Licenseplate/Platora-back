@@ -73,22 +73,23 @@ export class UsersService {
     user.certification = filename; 
     await this.userRepository.save(user);
 
-    // vehicle에 차량번호 저장
-    const plateNum = body.vehicleNumber; 
-    const vehicle = this.vehicleRepository.create({
-      user,
-      plate_num: plateNum,
-    });
-    await this.vehicleRepository.save(vehicle);
-
     // grade에 데이터 저장
     const newGrade = this.gradeRepository.create({
       grade_name: body.grade,
       price_unit: Number(body.score),
       min_price: Number(body.price)
     })
-    await this.gradeRepository.save(newGrade);
+    const savedGrade = await this.gradeRepository.save(newGrade);
 
+    // vehicle에 차량번호 저장
+    const plateNum = body.vehicleNumber; 
+    const vehicle = this.vehicleRepository.create({
+      user,
+      plate_num: plateNum,
+      grade: savedGrade
+    });
+    await this.vehicleRepository.save(vehicle);
+    
     return { message: '인증 업로드 및 등급저장 성공' };
   }
 }

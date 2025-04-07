@@ -1,16 +1,17 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Users } from './users.entity';
+import { Grades } from './grades';
 
 @Entity('vehicles')
 export class Vehicles {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Users, (user) => user.id, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: 'CASCADE'})
   user: Users;
+  
+  @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: 'CASCADE', nullable: true })
+  grade: Grades;
 
   @Column('varchar', { comment: '작성제목', length: 255, nullable: true })
   title: string;

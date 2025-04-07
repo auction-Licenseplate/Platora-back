@@ -27,7 +27,9 @@ export class VehiclesService {
       where: {
         plate_num: body.plate_num,
         ownership_status: 'approved',
+        user: { id: userId },
       },
+      relations: ['user'],
     });
 
     // 기존 차량 정보 업데이트
