@@ -40,7 +40,9 @@ export class VehiclesService {
   }
 
   // 등록 시 번호판 승인 여부 검사
-  async checkIfPlateIsApproved(plate_num: string): Promise<boolean> {
+  async checkIfPlateIsApproved(
+    plate_num: string,
+  ): Promise<{ isApproved: boolean; alreadyWritten: boolean }> {
     const existing = await this.vehicleRepository.findOne({
       where: {
         plate_num,
@@ -48,6 +50,12 @@ export class VehiclesService {
       },
     });
 
-    return !!existing;
+    const existingWrite = await this.vehicleRepository.findOne({
+      where: {
+        title: plate_num,
+      },
+    });
+
+    return { isApproved: !!existing, alreadyWritten: !!existingWrite };
   }
 }

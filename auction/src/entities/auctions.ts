@@ -9,7 +9,7 @@ import {
 import { Users } from './users.entity';
 import { Vehicles } from './vehicles';
 import { Grades } from './grades';
-import { Admins } from './admins';
+import { Bids } from './bids';
 
 @Entity('auctions')
 export class Auctions {
@@ -35,10 +35,8 @@ export class Auctions {
     cascade: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'grade_id' })
   grade: Grades;
-
-  @OneToMany(() => Admins, (admin) => admin.auction)
-  admins: Admins[];
 
   @Column({ type: 'timestamp' })
   start_time: Date;
@@ -55,4 +53,7 @@ export class Auctions {
 
   @Column({ type: 'int', nullable: true })
   final_price: number;
+
+  @OneToMany(() => Bids, (bid) => bid.auction)
+  bids: Bids[];
 }
