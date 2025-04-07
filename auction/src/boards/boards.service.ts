@@ -4,6 +4,7 @@ import { Auctions } from 'src/entities/auctions';
 import { Favorites } from 'src/entities/favorites';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
+import { Admins } from 'src/entities/admins';
 
 @Injectable()
 export class BoardsService {
@@ -14,6 +15,8 @@ export class BoardsService {
     private auctionRepository: Repository<Auctions>,
     @InjectRepository(Favorites)
     private favoriteRepository: Repository<Favorites>,
+    @InjectRepository(Admins)
+    private readonly adminRepository: Repository<Admins>,
   ) {}
 
   // 모든 게시글 정보 제공
@@ -36,22 +39,24 @@ export class BoardsService {
       .getRawMany(); // 결과 json 배열로 반환
   }
 
+  // 승인 전 제공
   async getMyPots(userId: string, query: any) {
-    const result = await this.auctionRepository
-      .createQueryBuilder('auction')
-      .innerJoin('auction.vehicle', 'vehicle')
-      .innerJoin('auction.grade', 'grade')
-      .innerJoin('auction.user', 'user')
-      .innerJoin('admins', 'admin', 'admin.auctionId = auction.id')
+    const result = await this.adminRepository
+      .createQueryBuilder('admin')
+      .leftJoin('admin.vehicle', 'vehicle')
+      .leftJoin('admin.user', 'user')
+      .leftJoin('admin.auction', 'auction')
+      .leftJoin('vehicle.grade', 'grade')
       .select([
-        'user.name AS userName',
-        'vehicle.title AS vehicleTitle',
-        'vehicle.car_img AS carImage',
-        'vehicle.car_info AS carInfo',
-        'grade.grade_name AS gradeName',
+        'user.name AS userName', // 판매자명
+        'vehicle.title AS vehicleTitle', // 차량 제목
+        'grade.grade_name AS gradeName', // 등급명
+        'grade.min_price AS finalPrice', // 시작가
+        'vehicle.car_img AS carImage', // 차량 이미지
+        'vehicle.car_info AS carInfo', // 차량 상세 정보
       ])
       .where('user.id = :userId', { userId })
-      .andWhere('auction.status = :status', { status: query.write_status })
+      .andWhere('admin.write_status = :status', { status: query.write_status })
       .getRawMany();
 
     return result;
@@ -106,14 +111,14 @@ export class BoardsService {
   }
 
   // 상세페이지 전달
-  async getDetailInfo(auctionId: number){
+  async getDetailInfo(auctionId: number) {
     return await this.auctionRepository
       .createQueryBuilder('au')
       .innerJoin('au.user', 'registerUser') // 등록한 사람
       .innerJoin('au.vehicle', 'vehicle')
       .innerJoin('au.bids', 'bid')
       .innerJoin('bid.user', 'bidUser') // 입찰한 사람
-      .where('au.id = :auctionId', {auctionId})
+      .where('au.id = :auctionId', { auctionId })
       .select([
         'au.final_price',
         'au.end_time',
@@ -123,9 +128,8 @@ export class BoardsService {
         'vehicle.car_img',
         'bid.bid_count',
         'bid.create_at',
-        'bidUser.name'
+        'bidUser.name',
       ])
       .getRawMany();
   }
-
 }

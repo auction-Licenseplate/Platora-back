@@ -1,5 +1,13 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Users } from './users.entity';
+import { Grades } from './grades';
 
 @Entity('vehicles')
 export class Vehicles {
@@ -11,6 +19,10 @@ export class Vehicles {
     onDelete: 'CASCADE',
   })
   user: Users;
+
+  @ManyToOne(() => Grades)
+  @JoinColumn({ name: 'grade_id' })
+  grade: Grades;
 
   @Column('varchar', { comment: '작성제목', length: 255, nullable: true })
   title: string;
@@ -30,6 +42,6 @@ export class Vehicles {
   })
   ownership_status: string; // 승인 상태 처음 waiting
 
-  @CreateDateColumn({ type: 'timestamp' }) 
+  @CreateDateColumn({ type: 'timestamp' })
   create_at: Date;
 }

@@ -16,7 +16,7 @@ export class UsersService {
     @InjectRepository(UserCheck)
     private userCheckRepository: Repository<UserCheck>,
     @InjectRepository(Grades)
-    private gradeRepository: Repository<Grades>
+    private gradeRepository: Repository<Grades>,
   ) {}
 
   // 마이페이지 정보 제공
@@ -39,25 +39,27 @@ export class UsersService {
   }
 
   // 이용약관 저장
-  async userAgree(userEmail: string, term: string){
-      const user = await this.userRepository.findOne({ where: {email: userEmail} });
-      if(!user) {
-          return { message: '유저정보 없음' };
-      }
+  async userAgree(userEmail: string, term: string) {
+    const user = await this.userRepository.findOne({
+      where: { email: userEmail },
+    });
+    if (!user) {
+      return { message: '유저정보 없음' };
+    }
 
-      const checking = this.userCheckRepository.create({
-          user: user,
-          term: term
-      });
+    const checking = this.userCheckRepository.create({
+      user: user,
+      term: term,
+    });
 
-      await this.userCheckRepository.save(checking);
-      return {message: '이용약관 저장 완료'};
+    await this.userCheckRepository.save(checking);
+    return { message: '이용약관 저장 완료' };
   }
 
   // 회원탈퇴
-  async userOut(userId: number){
-      await this.userRepository.delete({ id: userId });
-      return {message: '회원 탈퇴 완료'};
+  async userOut(userId: number) {
+    await this.userRepository.delete({ id: userId });
+    return { message: '회원 탈퇴 완료' };
   }
 
   // 공인인증서 db 저장
@@ -70,24 +72,25 @@ export class UsersService {
 
     // users에 공인인증서 저장
     const filename = file.filename;
-    user.certification = filename; 
+    user.certification = filename;
     await this.userRepository.save(user);
-
-    // vehicle에 차량번호 저장
-    const plateNum = body.vehicleNumber; 
-    const vehicle = this.vehicleRepository.create({
-      user,
-      plate_num: plateNum,
-    });
-    await this.vehicleRepository.save(vehicle);
 
     // grade에 데이터 저장
     const newGrade = this.gradeRepository.create({
       grade_name: body.grade,
       price_unit: Number(body.score),
-      min_price: Number(body.price)
-    })
+      min_price: Number(body.price),
+    });
     await this.gradeRepository.save(newGrade);
+
+    // vehicle에 차량번호 저장
+    const plateNum = body.vehicleNumber;
+    const vehicle = this.vehicleRepository.create({
+      user,
+      plate_num: plateNum,
+      grade: newGrade,
+    });
+    await this.vehicleRepository.save(vehicle);
 
     return { message: '인증 업로드 및 등급저장 성공' };
   }

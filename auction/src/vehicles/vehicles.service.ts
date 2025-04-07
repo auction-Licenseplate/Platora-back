@@ -1,15 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { Admins } from 'src/entities/admins';
 
 @Injectable()
 export class VehiclesService {
+  gradeRepository: any;
   constructor(
     @InjectRepository(Vehicles)
     private vehicleRepository: Repository<Vehicles>,
     private configService: ConfigService,
+
+    @InjectRepository(Admins)
+    private readonly adminsRepository: Repository<Admins>,
   ) {}
 
   async getCarData(userId: number) {
@@ -23,19 +28,53 @@ export class VehiclesService {
   async saveCarImg(userId: number, body: any, files: Express.Multer.File[]) {
     // 파일 이름으로 저장 (쉼표 구분)
     const filename = files.map((file) => file.filename).join(',');
+
     const vehicle = await this.vehicleRepository.findOne({
       where: {
-        plate_num: body.plate_num,
+        plate_num: body.title,
         ownership_status: 'approved',
+      },
+      relations: ['grade'],
+    });
+
+    if (!vehicle) {
+      throw new NotFoundException('차량 정보가 존재하지 않습니다.');
+    }
+
+    const grade = vehicle.grade;
+
+    // 기존 차량 정보 업데이트
+    vehicle.title = body.title;
+    vehicle.car_info = body.car_info;
+    vehicle.car_img = filename;
+
+    await this.vehicleRepository.save(vehicle);
+
+    let adminEntry = await this.adminsRepository.findOne({
+      where: {
+        vehicle: { id: vehicle.id },
+        user: { id: userId },
       },
     });
 
-    // 기존 차량 정보 업데이트
-    vehicle!.title = body.title;
-    vehicle!.car_info = body.car_info;
-    vehicle!.car_img = filename;
+    if (adminEntry) {
+      // 이미 있으면 업데이트
+      adminEntry.img = filename;
+      adminEntry.write_status = 'waiting';
+    } else {
+      // 없으면 새로 생성
+      adminEntry = this.adminsRepository.create({
+        user: { id: userId },
+        vehicle: { id: vehicle.id },
+        title: body.title,
+        grade,
+        img: filename,
+        write_status: 'waiting',
+      });
+    }
 
-    await this.vehicleRepository.save(vehicle!);
+    await this.adminsRepository.save(adminEntry);
+
     return { message: '작성글 저장완료', vehicle };
   }
 
@@ -43,6 +82,10 @@ export class VehiclesService {
   async checkIfPlateIsApproved(
     plate_num: string,
   ): Promise<{ isApproved: boolean; alreadyWritten: boolean }> {
+    if (!plate_num || plate_num.trim() === '') {
+      return { isApproved: false, alreadyWritten: false };
+    }
+
     const existing = await this.vehicleRepository.findOne({
       where: {
         plate_num,
