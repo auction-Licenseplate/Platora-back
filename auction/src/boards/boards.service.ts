@@ -36,25 +36,25 @@ export class BoardsService {
       .getRawMany(); // 결과 json 배열로 반환
   }
 
-  // 승인 전 제공
   async getMyPots(userId: string, query: any) {
-    return await this.auctionRepository
+    const result = await this.auctionRepository
       .createQueryBuilder('auction')
       .innerJoin('auction.vehicle', 'vehicle')
       .innerJoin('auction.grade', 'grade')
       .innerJoin('auction.user', 'user')
-      .innerJoin('auction.admins', 'admin')
+      .innerJoin('admins', 'admin', 'admin.auctionId = auction.id')
       .select([
-        'vehicle.title AS vehicleTitle', // 차량 제목
-        'vehicle.car_img AS carImage', // 차량 이미지
-        'vehicle.car_info AS carInfo', // 차량 상세 정보
-        'grade.grade_name AS gradeName', // 등급명
+        'user.name AS userName',
+        'vehicle.title AS vehicleTitle',
+        'vehicle.car_img AS carImage',
+        'vehicle.car_info AS carInfo',
+        'grade.grade_name AS gradeName',
       ])
-      .where('user.id = :userId', { userId }) // 해당 유저의 데이터만
-      .andWhere('admin.write_status = :write_status', {
-        write_status: query.write_status,
-      }) // status 조건 적용
+      .where('user.id = :userId', { userId })
+      .andWhere('auction.status = :status', { status: query.write_status })
       .getRawMany();
+
+    return result;
   }
 
   // 승인 후 제공
@@ -67,6 +67,7 @@ export class BoardsService {
       .innerJoin('auction.vehicle', 'vehicle')
       .innerJoin('auction.grade', 'grade')
       .select([
+        'auction.id AS auctionId', // 경매 아이디
         'auction.auction_num AS auctionNum', // 경매 번호
         'user.name AS userName', // 판매자명
         'vehicle.title AS vehicleTitle', // 차량 제목
@@ -74,6 +75,8 @@ export class BoardsService {
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태
+        'vehicle.car_img AS carImage', // 차량 이미지
+        'vehicle.car_info AS carInfo', // 차량 상세 정보
       ])
       .where('user.id = :userId', { userId }) // 해당 유저의 데이터
       .andWhere('auction.status IN (:...status)', { status: statusArray }) // status 조건 적용
@@ -88,6 +91,7 @@ export class BoardsService {
       .innerJoin('auction.user', 'user')
       .innerJoin('auction.vehicle', 'vehicle')
       .innerJoin('auction.grade', 'grade')
+      .innerJoin('favorite.user', 'favUser')
       .select([
         'user.name AS userName', // 판매자명
         'vehicle.title AS vehicleTitle', // 차량 제목
@@ -95,8 +99,9 @@ export class BoardsService {
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태
+        'vehicle.car_img AS carImage', // 차량 이미지
       ])
-      .where('user.id = :userId', { userId }) // 해당 유저의 데이터만
+      .where('favUser.id = :userId', { userId }) // 해당 유저의 데이터만
       .getRawMany();
   }
 

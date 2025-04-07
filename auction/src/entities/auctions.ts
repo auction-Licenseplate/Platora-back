@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -35,6 +36,7 @@ export class Auctions {
     cascade: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'grade_id' })
   grade: Grades;
 
   @OneToMany(() => Admins, (admin) => admin.auction)
