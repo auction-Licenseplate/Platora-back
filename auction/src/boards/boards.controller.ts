@@ -16,6 +16,7 @@ export class BoardsController {
   @Get('/getMyPosts')
   @UseGuards(JwtAuthGuard)
   async getNo(@Query() query, @Req() req) {
+    console.log('쿼리어케나오니', query);
     const userId = req.user.id;
     return await this.boardService.getMyPots(userId, query);
   }
@@ -24,6 +25,7 @@ export class BoardsController {
   @Get('/getPosts')
   @UseGuards(JwtAuthGuard)
   async getYes(@Query() query, @Req() req) {
+    // console.log('쿼리어케나오니', query);
     const userId = req.user.id;
     return await this.boardService.getPosts(userId, query);
   }

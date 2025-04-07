@@ -85,6 +85,12 @@ export class AdminsService {
       select: ['title', 'img'],
     });
   }
+  async bannerGet2(){
+    return await this.adminRepository.find({
+      select: ['img'],
+      take: 3 // 3개 제한
+    });
+  }
 
   // 경매 물품 전달
   async itemInfo() {

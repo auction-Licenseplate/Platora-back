@@ -3,11 +3,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Users } from './users.entity';
 import { Vehicles } from './vehicles';
 import { Grades } from './grades';
+import { Admins } from './admins';
 
 @Entity('auctions')
 export class Auctions {
@@ -33,8 +35,10 @@ export class Auctions {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'grade_id' })
   grade: Grades;
+
+  @OneToMany(() => Admins, (admin) => admin.auction)
+  admins: Admins[];
 
   @Column({ type: 'timestamp' })
   start_time: Date;
