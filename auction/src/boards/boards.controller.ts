@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
@@ -16,7 +16,6 @@ export class BoardsController {
   @Get('/getMyPosts')
   @UseGuards(JwtAuthGuard)
   async getNo(@Query() query, @Req() req) {
-    console.log('쿼리어케나오니', query);
     const userId = req.user.id;
     return await this.boardService.getMyPots(userId, query);
   }
@@ -25,7 +24,6 @@ export class BoardsController {
   @Get('/getPosts')
   @UseGuards(JwtAuthGuard)
   async getYes(@Query() query, @Req() req) {
-    // console.log('쿼리어케나오니', query);
     const userId = req.user.id;
     return await this.boardService.getPosts(userId, query);
   }
@@ -36,5 +34,12 @@ export class BoardsController {
   async getFavorite(@Req() req) {
     const userId = req.user.id;
     return await this.boardService.getfavorite(userId);
+  }
+
+  // 상세페이지 정보 전달
+  @Post('/detail')
+  async detailPage(@Body() body: {id: number}){
+    const { id } = body;
+    return await this.boardService.getDetailInfo(id);
   }
 }

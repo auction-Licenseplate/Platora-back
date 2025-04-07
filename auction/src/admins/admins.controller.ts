@@ -56,14 +56,6 @@ export class AdminsController {
     return this.adminService.userDelete(email);
   }
 
-  // 상세페이지 정보 전달
-  @Post('/detail')
-  async detailPage(@Body() body: {id: number}){
-    console.log('바디어떠려나', body);
-    const { id } = body;
-    return await this.adminService.getDetailInfo(id);
-  }
-
   // 사용자 차량승인 상태 전달 (프론트)
   @Get('/getStatus')
   @UseGuards(JwtAuthGuard)

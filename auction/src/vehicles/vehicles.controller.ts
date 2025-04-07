@@ -61,4 +61,5 @@ export class VehiclesController {
     const exists = await this.vehicleService.checkIfPlateIsApproved(plate);
     return { exists };
   }
+
 }

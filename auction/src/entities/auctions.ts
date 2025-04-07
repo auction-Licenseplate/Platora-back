@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,6 +9,7 @@ import { Users } from './users.entity';
 import { Vehicles } from './vehicles';
 import { Grades } from './grades';
 import { Admins } from './admins';
+import { Bids } from './bids';
 
 @Entity('auctions')
 export class Auctions {
@@ -39,6 +39,9 @@ export class Auctions {
 
   @OneToMany(() => Admins, (admin) => admin.auction)
   admins: Admins[];
+
+  @OneToMany(() => Bids, (bid) => bid.auction)
+  bids: Bids[];
 
   @Column({ type: 'timestamp' })
   start_time: Date;
