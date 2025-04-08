@@ -25,6 +25,7 @@ import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
 import { Role } from './entities/role';
 import { Bids } from './entities/bids';
+import { Banners } from './entities/banners';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { Bids } from './entities/bids';
         Notifications,
         Role,
         Bids,
+        Banners
       ],
       charset: 'utf8mb4',
       synchronize: process.env.NODE_ENV !== 'production', // 개발 환경에서만 true

@@ -4,7 +4,7 @@ import { Grades } from 'src/entities/grades';
 import { UserCheck } from 'src/entities/user_check';
 import { Users } from 'src/entities/users.entity';
 import { Vehicles } from 'src/entities/vehicles';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -72,11 +72,15 @@ export class UsersService {
 
     // 이미 등록된 번호판인지
     const existingVehicle = await this.vehicleRepository.findOne({
-      where: { plate_num: body.vehicleNumber },
+      where: { plate_num: body.vehicleNumber},
     });
 
-    if (existingVehicle) {
+    const status = existingVehicle?.ownership_status?.trim();
+
+    if (status === 'approved') {
       return { success: false, message: '이미 등록된 차량입니다.' };
+    } else if (status === 'waiting') {
+      return { success: false, message: '승인 대기 중인 차량입니다.' };
     }
 
     // users에 공인인증서 저장
@@ -87,7 +91,7 @@ export class UsersService {
     // grade에 데이터 저장
     const newGrade = this.gradeRepository.create({
       grade_name: body.grade,
-      price_unit: Number(body.score),
+      price_unit: Number(body.score)*100,
       min_price: Number(body.price),
     });
     await this.gradeRepository.save(newGrade);
@@ -100,19 +104,6 @@ export class UsersService {
       grade: newGrade,
     });
     await this.vehicleRepository.save(vehicle);
-
-    //   min_price: Number(body.price)
-    // })
-    // const savedGrade = await this.gradeRepository.save(newGrade);
-
-    // // vehicle에 차량번호 저장
-    // const plateNum = body.vehicleNumber;
-    // const vehicle = this.vehicleRepository.create({
-    //   user,
-    //   plate_num: plateNum,
-    //   grade: savedGrade
-    // });
-    // await this.vehicleRepository.save(vehicle);
 
     return { message: '인증 업로드 및 등급저장 성공' };
   }

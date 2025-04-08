@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Users } from './users.entity';
 import { Auctions } from './auctions';
 import { Vehicles } from './vehicles';
@@ -33,12 +26,6 @@ export class Admins {
 
   @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, {cascade: true, onDelete: 'CASCADE'})
   vehicle: Vehicles;
-
-  @Column('varchar', { comment: '배너 타이틀', nullable: true })
-  title: string;
-
-  @Column('varchar', { comment: '배너 이미지', nullable: true })
-  img: string;
 
   @Column('enum', {
     enum: ['approved', 'pending', 'waiting'],

@@ -124,6 +124,7 @@ export class BoardsService {
         'au.final_price',
         'au.end_time',
         'au.auction_num', // 경매번호
+        'au.id', // 경매엔티티 PK
         'registerUser.name',
         'vehicle.car_info',
         'vehicle.car_img',

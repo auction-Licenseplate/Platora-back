@@ -7,8 +7,9 @@ import { Vehicles } from 'src/entities/vehicles';
 import { Payment } from 'src/entities/payment';
 import { Admins } from 'src/entities/admins';
 import { Auctions } from 'src/entities/auctions';
+import { Banners } from 'src/entities/banners';
 @Module({
-  imports: [TypeOrmModule.forFeature([Users, Vehicles, Payment, Admins, Auctions])],
+  imports: [TypeOrmModule.forFeature([Users, Vehicles, Payment, Admins, Auctions, Banners])],
   providers: [AdminsService],
   controllers: [AdminsController],
 })

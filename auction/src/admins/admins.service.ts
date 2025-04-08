@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { Payment } from 'src/entities/payment';
 import { Admins } from 'src/entities/admins';
 import { Auctions } from 'src/entities/auctions';
-import { Grades } from 'src/entities/grades';
+import { Banners } from 'src/entities/banners';
 @Injectable()
 export class AdminsService {
   constructor(
@@ -20,6 +20,8 @@ export class AdminsService {
     private adminRepository: Repository<Admins>,
     @InjectRepository(Auctions)
     private auctionRepository: Repository<Auctions>,
+    @InjectRepository(Banners)
+    private bannerRepository: Repository<Banners>
   ) {}
 
   // 회원 관리
@@ -76,27 +78,21 @@ export class AdminsService {
 
   // 포인트 환불상태 변경
   async approveRefund(userId: number){
-    // const payment = await this.paymentRepository.findOne({
-    //   where: {
-    //     user: {id: userId},
-    //     refund_status: 'waiting',
-    //   },
-    //   relations: ['user'],
-    // });
+    const payment = await this.paymentRepository.findOne({
+      where: {
+        user: {id: userId},
+        refund_status: 'waiting',
+      },
+    });
 
-    // if(!payment){
-    //   return { message: '해당 유저 환불대기 내역 없음' };
-    // }
+    if(!payment){
+      return { message: '해당 유저 환불대기 내역 없음' };
+    }
 
-    // payment.refund_status = 'success'; // 환불상태 변경
-    // await this.paymentRepository.save(payment);
-
-    // const user = payment.user; // 해당 유저포인트에 환불금액 추가
-    // console.log(user, '환불됨?')
-    // user.point = (user.point || 0) + (payment.refund_amount || 0);
-    // await this.userRepository.save(user);
+    payment.refund_status = 'success'; // 환불상태 변경
+    await this.paymentRepository.save(payment);
     
-    // return { message: '환불 승인 완료'};
+    return { message: '환불 상태 변경 완료'};
   }
 
   //공동인증서 승인
@@ -112,13 +108,13 @@ export class AdminsService {
 
   // 배너 이미지 전달
   async bannerGet() {
-    return await this.adminRepository.find({
-      select: ['title', 'img'],
+    return await this.bannerRepository.find({
+      select: ['banner_title', 'banner_img'],
     });
   }
   async bannerGet2(){
-    return await this.adminRepository.find({
-      select: ['img'],
+    return await this.bannerRepository.find({
+      select: ['banner_img'],
       take: 3 // 3개 제한
     });
   }

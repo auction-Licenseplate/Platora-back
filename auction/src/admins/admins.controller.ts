@@ -42,6 +42,12 @@ export class AdminsController {
     return this.adminService.bannerGet2();
   }
 
+  // 배너 추가
+  @Post('/imgvalue')
+  async postBaaner(@Body() body){
+    console.log('어카냐', body)
+  }
+
   // 경매 물품 전달
   @Get('/iteminfo')
   async auctionItem(){
