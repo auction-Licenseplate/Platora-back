@@ -144,7 +144,8 @@ export class BoardsService {
   
     return {
       data: result,
-      isFavorite: isFavorite > 0 // 0이면 false, 1이상이면 true로 보냄
+      isFavorite: isFavorite > 0, // 0이면 false, 1이상이면 true로 보냄
+      userId
     };
   }
 }
