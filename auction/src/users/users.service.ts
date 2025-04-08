@@ -70,6 +70,15 @@ export class UsersService {
       return { message: '유저정보 없음' };
     }
 
+    // 이미 등록된 번호판인지
+    const existingVehicle = await this.vehicleRepository.findOne({
+      where: { plate_num: body.vehicleNumber },
+    });
+
+    if (existingVehicle) {
+      return { success: false, message: '이미 등록된 차량입니다.' };
+    }
+
     // users에 공인인증서 저장
     const filename = file.filename;
     user.certification = filename;
