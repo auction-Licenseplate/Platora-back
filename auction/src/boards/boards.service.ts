@@ -5,18 +5,21 @@ import { Favorites } from 'src/entities/favorites';
 import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
 import { Admins } from 'src/entities/admins';
+import { Bids } from 'src/entities/bids';
 
 @Injectable()
 export class BoardsService {
   constructor(
-    @InjectRepository(Vehicles)
-    private vehicleRepository: Repository<Vehicles>,
     @InjectRepository(Auctions)
     private auctionRepository: Repository<Auctions>,
     @InjectRepository(Favorites)
     private favoriteRepository: Repository<Favorites>,
     @InjectRepository(Admins)
     private readonly adminRepository: Repository<Admins>,
+    @InjectRepository(Vehicles)
+    private vehicleRepository: Repository<Vehicles>,
+    @InjectRepository(Bids)
+    private bidRepository: Repository<Bids>
   ) {}
 
   // 모든 게시글 정보 제공
@@ -147,5 +150,35 @@ export class BoardsService {
       isFavorite: isFavorite > 0, // 0이면 false, 1이상이면 true로 보냄
       userId
     };
+  }
+
+  // 입찰 가격 갱신
+  async updatePrice(auctionId: number, price: number){
+    // auctions에서 해당 경매 찾고 가격 갱신
+    const auction = await this.auctionRepository.findOne({
+      where: {id: auctionId}
+    });
+
+    if(!auction){
+      return {meassage: '해당 경매 없음'}
+    }
+
+    auction.final_price = price; 
+    await this.auctionRepository.save(auction);
+
+    // bids에서 해당 경매 찾고 횟수 갱신
+    const bid = await this.bidRepository.findOne({
+      where: { auction: { id: auctionId } },
+      relations: ['auction'],
+    });
+
+    if(!bid){
+      return {message: '입찰정보 찾을 수 없음'}      
+    }
+
+    bid.bid_count += 1;
+    await this.bidRepository.save(bid);
+
+    return {message: '입찰가/횟수 갱신 완료'};
   }
 }

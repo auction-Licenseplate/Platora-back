@@ -7,6 +7,7 @@ import { Payment } from 'src/entities/payment';
 import { Admins } from 'src/entities/admins';
 import { Auctions } from 'src/entities/auctions';
 import { Banners } from 'src/entities/banners';
+import { Bids } from 'src/entities/bids';
 @Injectable()
 export class AdminsService {
   constructor(
@@ -21,7 +22,9 @@ export class AdminsService {
     @InjectRepository(Auctions)
     private auctionRepository: Repository<Auctions>,
     @InjectRepository(Banners)
-    private bannerRepository: Repository<Banners>
+    private bannerRepository: Repository<Banners>,
+    @InjectRepository(Bids)
+    private bidRepository: Repository<Bids>
   ) {}
 
   // 회원 관리
@@ -119,6 +122,21 @@ export class AdminsService {
     });
   }
 
+  // 배너 추가
+  async saveBanner(text: string, file: Express.Multer.File){
+    if (!text || !file) {
+      return {message: '제목과 이미지 없음'}
+    }
+
+    const banner = this.bannerRepository.create({
+      banner_title: text,
+      banner_img: file.filename
+    })
+
+    await this.bannerRepository.save(banner);
+    return {message: '배너 저장 완료', banner};
+  }
+
   // 경매 물품 전달
   async itemInfo() {
     return await this.vehicleRepository
@@ -200,6 +218,16 @@ export class AdminsService {
       });
 
       await this.auctionRepository.save(auctionRecord);
+
+      // 4. bids에 레코드 삽입
+      const bidRecord = this.bidRepository.create({
+        user,
+        auction: auctionRecord,
+        bid_count: 0 // 초기 입찰횟수 0 지정
+      })
+
+      await this.bidRepository.save(bidRecord);
+
     }
     return { message: '경매 승인 성공' };
   }

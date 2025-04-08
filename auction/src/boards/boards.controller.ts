@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards} from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
@@ -48,9 +40,15 @@ export class BoardsController {
   @Post('/detail')
   @UseGuards(JwtAuthGuard)
   async detailPage(@Body() body: {id: string}, @Req() req){
-    // console.log(body, '확인용')
     const { id } = body;
     const userId = req.user.id
     return await this.boardService.getDetailInfo(id, userId);
+  }
+
+  // 입찰가 갱신
+  @Post('/priceupdate')
+  async postPrice(@Body() body: {id: number, price: number}){
+    const { id, price } = body;
+    return await this.boardService.updatePrice(id, price);
   }
 }

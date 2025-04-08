@@ -2,6 +2,9 @@ import { Body, Controller, Post, Get, UseGuards, Req, Delete, UseInterceptors, U
 import { AdminsService } from './admins.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { join } from 'path';
+
 @Controller('admins')
 export class AdminsController {
   constructor(private readonly adminService: AdminsService) {}
@@ -45,18 +48,18 @@ export class AdminsController {
 
   // 배너 추가
   @Post('/imgvalue')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadBanner(
-    @UploadedFile() file: Express.Multer.File,
-    @Body('text') text: string,
-  ) {
-    console.log('제목:', text);
-    console.log('파일 경로:', file.path);
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: join(__dirname, '../../uploads'), // 저장할 경로
+      filename: (req, file, callback) => {
+        const filename = `${Date.now()}_${file.originalname}`;
+        callback(null, filename);
+      },
+    }),
+  }))
+  async uploadBanner( @UploadedFile() file: Express.Multer.File, @Body('text') text: string ) {
+    return await this.adminService.saveBanner(text, file)
   }
-  // async postBaaner(@Body() body){
-  //   console.log('어카냐', body);
-
-  // }
 
   // 경매 물품 전달
   @Get('/iteminfo')
@@ -64,10 +67,9 @@ export class AdminsController {
     return this.adminService.itemInfo();
   }
 
-  // 경매 승인 (auction 테이블 저장)
+  // 경매 승인 (admin/auction/bid 테이블 저장)
   @Post('/iteminfo/sucess')
   async postSucess(@Body() body: { userid: number, platenum: string }){
-    console.log('경매요청어케되는거니', body)
     return this.adminService.success(body.userid, body.platenum);
   }
 
