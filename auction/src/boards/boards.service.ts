@@ -118,17 +118,20 @@ export class BoardsService {
       .innerJoin('au.vehicle', 'vehicle')
       .innerJoin('au.bids', 'bid')
       .innerJoin('bid.user', 'bidUser') // 입찰한 사람
+      .innerJoin('au.grade', 'grade')
       .where('au.id = :auctionId', { auctionId })
       .select([
         'au.final_price',
         'au.end_time',
-        'au.auction_num',
+        'au.auction_num', // 경매번호
         'registerUser.name',
         'vehicle.car_info',
         'vehicle.car_img',
+        'vehicle.plate_num', // 번호판
         'bid.bid_count',
         'bid.create_at',
         'bidUser.name',
+        'grade.price_unit' // 입찰단위
       ])
       .getRawMany();
   }
