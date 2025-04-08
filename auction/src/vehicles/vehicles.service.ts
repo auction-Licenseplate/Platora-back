@@ -78,9 +78,7 @@ export class VehiclesService {
   }
 
   // 등록 시 번호판 승인 여부 검사
-  async checkIfPlateIsApproved(
-    plate_num: string,
-  ): Promise<{ isApproved: boolean; alreadyWritten: boolean }> {
+  async checkIfPlateIsApproved(plate_num: string, userId: string){
     if (!plate_num || plate_num.trim() === '') {
       return { isApproved: false, alreadyWritten: false };
     }
@@ -89,12 +87,14 @@ export class VehiclesService {
       where: {
         plate_num,
         ownership_status: 'approved',
+        user: { id: Number(userId) },
       },
     });
 
     const existingWrite = await this.vehicleRepository.findOne({
       where: {
         title: plate_num, // title이랑 plate_num이 같을 경우를 찾아 보내주기
+        user: { id: Number(userId) },
       },
     });
 

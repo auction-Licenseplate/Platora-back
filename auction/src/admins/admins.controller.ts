@@ -1,6 +1,7 @@
-import { Body, Controller, Post, Get, UseGuards, Req, Delete } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Req, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AdminsService } from './admins.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('admins')
 export class AdminsController {
   constructor(private readonly adminService: AdminsService) {}
@@ -44,9 +45,18 @@ export class AdminsController {
 
   // 배너 추가
   @Post('/imgvalue')
-  async postBaaner(@Body() body){
-    console.log('어카냐', body)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadBanner(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('text') text: string,
+  ) {
+    console.log('제목:', text);
+    console.log('파일 경로:', file.path);
   }
+  // async postBaaner(@Body() body){
+  //   console.log('어카냐', body);
+
+  // }
 
   // 경매 물품 전달
   @Get('/iteminfo')

@@ -57,8 +57,9 @@ export class VehiclesController {
   // 등록 시 번호판 승인 여부 검사
   @Get('/checkApprovedPlate')
   @UseGuards(JwtAuthGuard)
-  async checkApprovedPlate(@Query('plate') plate: string) {
-    const exists = await this.vehicleService.checkIfPlateIsApproved(plate);
+  async checkApprovedPlate(@Query('plate') plate: string, @Req() req) {
+    const userId = req.user.id;
+    const exists = await this.vehicleService.checkIfPlateIsApproved(plate, userId);
     return { exists };
   }
 
