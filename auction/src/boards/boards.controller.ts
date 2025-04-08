@@ -50,7 +50,7 @@ export class BoardsController {
   async detailPage(@Body() body: {id: string}, @Req() req){
     // console.log(body, '확인용')
     const { id } = body;
-    const user = req.user.id
-    return await this.boardService.getDetailInfo(id, user);
+    const userId = req.user.id
+    return await this.boardService.getDetailInfo(id, userId);
   }
 }
