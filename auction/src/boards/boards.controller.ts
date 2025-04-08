@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
@@ -38,8 +46,8 @@ export class BoardsController {
 
   // 상세페이지 정보 전달
   @Post('/detail')
-  async detailPage(@Body() body: {id: string}){
-    console.log(body, '확인용')
+  async detailPage(@Body() body: { id: string }) {
+    console.log(body, '확인용');
     const { id } = body;
     return await this.boardService.getDetailInfo(id);
   }
