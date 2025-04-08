@@ -39,7 +39,7 @@ export class VehiclesService {
     });
 
     if (!vehicle) {
-      throw new NotFoundException('차량 정보가 존재하지 않습니다.');
+      return {message: '만족하는 차량 없음'};
     }
 
     const grade = vehicle.grade;
