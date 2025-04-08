@@ -111,8 +111,8 @@ export class BoardsService {
   }
 
   // 상세페이지 전달
-  async getDetailInfo(auctionId: string) {
-    return await this.auctionRepository
+  async getDetailInfo(auctionId: string, userId: string) {
+    const result = await this.auctionRepository
       .createQueryBuilder('au')
       .innerJoin('au.user', 'registerUser') // 등록한 사람
       .innerJoin('au.vehicle', 'vehicle')
@@ -135,5 +135,16 @@ export class BoardsService {
         'grade.price_unit' // 입찰단위
       ])
       .getRawMany();
+
+    const isFavorite = await this.favoriteRepository
+      .createQueryBuilder('fav')
+      .where('fav.auction = :auctionId', {auctionId})
+      .andWhere('fav.user = :userId', {userId})
+      .getCount();
+  
+    return {
+      data: result,
+      isFavorite: isFavorite > 0 // 0이면 false, 1이상이면 true로 보냄
+    };
   }
 }
