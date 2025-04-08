@@ -20,8 +20,6 @@ export class AdminsService {
     private adminRepository: Repository<Admins>,
     @InjectRepository(Auctions)
     private auctionRepository: Repository<Auctions>,
-    @InjectRepository(Grades)
-    private gradeRepository: Repository<Grades>
   ) {}
 
   // 회원 관리
@@ -76,7 +74,7 @@ export class AdminsService {
     return formattedData;
   }
 
-  // 포인트 반환 승인
+  // 포인트 환불상태 변경
   async approveRefund(userId: number){
     // const payment = await this.paymentRepository.findOne({
     //   where: {
@@ -167,7 +165,7 @@ export class AdminsService {
       where: {
         user: { id: user.id },
         vehicle: { id: vehicle.id },
-        write_status: 'pending',
+        write_status: 'waiting',
       },
       relations: ['user', 'vehicle'],
     });

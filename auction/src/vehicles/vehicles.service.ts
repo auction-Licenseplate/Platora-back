@@ -61,16 +61,13 @@ export class VehiclesService {
 
     if (adminEntry) {
       // 이미 있으면 업데이트
-      adminEntry.img = filename;
       adminEntry.write_status = 'waiting';
     } else {
       // 없으면 새로 생성
       adminEntry = this.adminsRepository.create({
         user: { id: userId },
         vehicle: { id: vehicle.id },
-        title: body.title,
         grade,
-        img: filename,
         write_status: 'waiting',
       });
     }

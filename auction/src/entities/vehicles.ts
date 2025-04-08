@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -16,13 +15,8 @@ export class Vehicles {
 
   @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: 'CASCADE'})
   user: Users;
-  
-  // 새로추가
-  @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: 'CASCADE', nullable: true }) 
-  grade: Grades;
 
-  @ManyToOne(() => Grades)
-  @JoinColumn({ name: 'grade_id' })
+  @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: 'CASCADE', nullable: true }) 
   grade: Grades;
 
   @Column('varchar', { comment: '작성제목', length: 255, nullable: true })

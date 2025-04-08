@@ -111,7 +111,7 @@ export class BoardsService {
   }
 
   // 상세페이지 전달
-  async getDetailInfo(auctionId: number) {
+  async getDetailInfo(auctionId: string) {
     return await this.auctionRepository
       .createQueryBuilder('au')
       .innerJoin('au.user', 'registerUser') // 등록한 사람

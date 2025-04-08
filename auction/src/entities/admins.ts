@@ -28,18 +28,10 @@ export class Admins {
   })
   auction: Auctions;
 
-  @ManyToOne(() => Grades, (grade) => grade.id, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'grade_id' })
+  @ManyToOne(() => Grades, (grade) => grade.id, {cascade: true, onDelete: 'CASCADE'})
   grade: Grades;
 
-  @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'vehicleId' })
+  @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, {cascade: true, onDelete: 'CASCADE'})
   vehicle: Vehicles;
 
   @Column('varchar', { comment: '배너 타이틀', nullable: true })
@@ -47,12 +39,6 @@ export class Admins {
 
   @Column('varchar', { comment: '배너 이미지', nullable: true })
   img: string;
-
-  @Column('timestamp', { comment: '경매시작 날짜', nullable: true })
-  auction_start: Date;
-
-  @Column('timestamp', { comment: '경매끝나는 날짜', nullable: true })
-  auction_end: Date;
 
   @Column('enum', {
     enum: ['approved', 'pending', 'waiting'],

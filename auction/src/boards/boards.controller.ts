@@ -38,7 +38,8 @@ export class BoardsController {
 
   // 상세페이지 정보 전달
   @Post('/detail')
-  async detailPage(@Body() body: {id: number}){
+  async detailPage(@Body() body: {id: string}){
+    console.log(body, '확인용')
     const { id } = body;
     return await this.boardService.getDetailInfo(id);
   }
