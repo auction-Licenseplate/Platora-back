@@ -110,6 +110,7 @@ export class BoardsService {
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태
+        'auction.id AS auctionID', // 경매 PK
         'vehicle.car_img AS carImage', // 차량 이미지
       ])
       .where('favUser.id = :userId', { userId }) // 해당 유저의 데이터만
@@ -200,13 +201,14 @@ export class BoardsService {
       where: { user, auction },
     });
 
-    if (existingFavorite) {
+    if (existingFavorite) { // 토글 진행
       return { message: '이미 좋아요 누름' };
     }
 
     const favorite = this.favoriteRepository.create({
       user,
-      auction
+      auction,
+      status: true,
     });
     await this.favoriteRepository.save(favorite);
 

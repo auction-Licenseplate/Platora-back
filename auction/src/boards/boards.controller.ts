@@ -55,7 +55,6 @@ export class BoardsController {
   // 좋아요 업데이트
   @Post('/likepost')
   async postLike(@Body() body: {id: number, userId: string}){
-    console.log(body, '나와라얍');
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
