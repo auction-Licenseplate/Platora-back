@@ -98,6 +98,15 @@ export class VehiclesService {
       },
     });
 
-    return { isApproved: !!existing, alreadyWritten: !!existingWrite };
+    const otherUsers = await this.vehicleRepository.find({
+      where: { title: plate_num },
+      relations: ['user'],
+    });
+
+    const anotherUser = otherUsers.some(
+      (vehicle) => vehicle.user.id !== Number(userId),
+    );
+
+    return { isApproved: !!existing, alreadyWritten: !!existingWrite, anotherUser };
   }
 }
