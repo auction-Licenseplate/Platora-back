@@ -198,11 +198,20 @@ export class BoardsService {
     }
 
     const existingFavorite = await this.favoriteRepository.findOne({
-      where: { user, auction },
+      where: {
+        user: { id: numUserId },
+        auction: { id: auctionId },
+      },
+      relations: ['user', 'auction'],
     });
 
     if (existingFavorite) { // 토글 진행
-      return { message: '이미 좋아요 누름' };
+      existingFavorite.status = !existingFavorite.status;
+      await this.favoriteRepository.save(existingFavorite);
+      return { 
+        message: existingFavorite.status ? '좋아요 등록 완료' : '좋아요 취소 완료',
+        status: existingFavorite.status,
+       };
     }
 
     const favorite = this.favoriteRepository.create({
@@ -212,6 +221,6 @@ export class BoardsService {
     });
     await this.favoriteRepository.save(favorite);
 
-    return { message: '좋아요 등록 완료' };
+    return { message: '좋아요 등록 완료', status: true };
   }
 }
