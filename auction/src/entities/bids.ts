@@ -13,8 +13,8 @@ export class Bids {
     @ManyToOne(() => Auctions, (auction) => auction.id, { cascade: true, onDelete: "CASCADE" })
     auction: Auctions;
 
-    @Column('int', {comment:'입찰횟수', nullable: true})
-    bid_count: number;
+    @Column('int', {comment:'현재 가격', nullable: true})
+    bid_price: number;
 
     @CreateDateColumn({ type: 'timestamp' }) 
     create_at: Date;

@@ -223,7 +223,6 @@ export class AdminsService {
       const bidRecord = this.bidRepository.create({
         user,
         auction: auctionRecord,
-        bid_count: 0 // 초기 입찰횟수 0 지정
       })
 
       await this.bidRepository.save(bidRecord);

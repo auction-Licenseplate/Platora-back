@@ -47,9 +47,9 @@ export class BoardsController {
 
   // 입찰가 갱신
   @Post('/priceupdate')
-  async postPrice(@Body() body: {id: number, price: number}){
-    const { id, price } = body;
-    return await this.boardService.updatePrice(id, price);
+  async postPrice(@Body() body: {id: number; price: number; userId: string}){
+    const { id, price, userId } = body;
+    return await this.boardService.updatePrice(id, price, userId);
   }
 
   // 좋아요 업데이트
@@ -58,4 +58,6 @@ export class BoardsController {
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
+
+  // 좋아요 삭제
 }

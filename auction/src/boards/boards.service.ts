@@ -136,54 +136,63 @@ export class BoardsService {
         'vehicle.car_info',
         'vehicle.car_img',
         'vehicle.plate_num', // 번호판
-        'bid.bid_count',
         'bid.create_at',
         'bidUser.name',
         'grade.price_unit' // 입찰단위
       ])
       .getRawMany();
 
-    const isFavorite = await this.favoriteRepository
+    const lastBid = await this.bidRepository
+      .createQueryBuilder('bid')
+      .innerJoin('bid.user', 'user') // 입찰버튼 누른 사람
+      .where('bid.auction = :auctionId', { auctionId })
+      .orderBy('bid.create_at', 'DESC')
+      .select([
+        'user.id', // 입찰자 id (PK)
+        'user.point', // 입찰자 포인트
+        'bid.bid_price' // 입찰가격
+      ])
+      .getOne();
+
+    const favorite = await this.favoriteRepository
       .createQueryBuilder('fav')
-      .where('fav.auction = :auctionId', {auctionId})
-      .andWhere('fav.user = :userId', {userId})
-      .getCount();
+      .where('fav.auction = :auctionId', { auctionId })
+      .andWhere('fav.user = :userId', { userId: Number(userId) })
+      .andWhere('fav.status = true')
+      .getOne();
   
     return {
       data: result,
-      isFavorite: isFavorite > 0, // 0이면 false, 1이상이면 true로 보냄
-      userId
+      isFavorite: favorite ? true : false,
+      userId,
+      lastBid
     };
   }
 
   // 입찰 가격 갱신
-  async updatePrice(auctionId: number, price: number){
+  async updatePrice(auctionId: number, price: number, userId: string){
     // auctions에서 해당 경매 찾고 가격 갱신
-    const auction = await this.auctionRepository.findOne({
-      where: {id: auctionId}
-    });
+    const auction = await this.auctionRepository.findOne({where: {id: auctionId}});
+    const user = await this.userRepository.findOne({ where: { id: Number(userId) } });
 
-    if(!auction){
-      return {meassage: '해당 경매 없음'}
+    if (!auction || !user) {
+      return { message: '경매 또는 유저 정보 없음' };
     }
 
+    // auction 테이블의 최종 가격 갱신
     auction.final_price = price; 
     await this.auctionRepository.save(auction);
 
-    // bids에서 해당 경매 찾고 횟수 갱신
-    const bid = await this.bidRepository.findOne({
-      where: { auction: { id: auctionId } },
-      relations: ['auction'],
+    // bid 경매데이터 저장 (입찰할 때마다 누적)
+    const newBid = this.bidRepository.create({
+      user,
+      auction,
+      bid_price: price,
     });
+    await this.bidRepository.save(newBid);
 
-    if(!bid){
-      return {message: '입찰정보 찾을 수 없음'}      
-    }
-
-    bid.bid_count += 1;
-    await this.bidRepository.save(bid);
-
-    return {message: '입찰가/횟수 갱신 완료'};
+    return {message: '최종입찰가 갱신 / 입찰기록 저장 완료', newBid};
+    // + 이전 사람의 point는 환불해주고, 현재 사람의 point 차감하기
   }
 
   // 좋아요 업데이트
