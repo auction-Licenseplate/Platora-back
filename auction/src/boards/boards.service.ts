@@ -6,6 +6,7 @@ import { Vehicles } from 'src/entities/vehicles';
 import { Repository } from 'typeorm';
 import { Admins } from 'src/entities/admins';
 import { Bids } from 'src/entities/bids';
+import { Users } from 'src/entities/users.entity';
 
 @Injectable()
 export class BoardsService {
@@ -19,7 +20,9 @@ export class BoardsService {
     @InjectRepository(Vehicles)
     private vehicleRepository: Repository<Vehicles>,
     @InjectRepository(Bids)
-    private bidRepository: Repository<Bids>
+    private bidRepository: Repository<Bids>,
+    @InjectRepository(Users)
+    private userRepository: Repository<Users>
   ) {}
 
   // 모든 게시글 정보 제공
@@ -180,5 +183,33 @@ export class BoardsService {
     await this.bidRepository.save(bid);
 
     return {message: '입찰가/횟수 갱신 완료'};
+  }
+
+  // 좋아요 업데이트
+  async updateLike(auctionId: number, userId: string){
+    const numUserId = Number(userId); // 타입 맞춰서 진행해야함
+
+    const user = await this.userRepository.findOne({ where: { id: numUserId } });
+    const auction = await this.auctionRepository.findOne({ where: { id: auctionId } });
+
+    if (!user || !auction) {
+      return { message: '유저랑 경매 정보 없음' };
+    }
+
+    const existingFavorite = await this.favoriteRepository.findOne({
+      where: { user, auction },
+    });
+
+    if (existingFavorite) {
+      return { message: '이미 좋아요 누름' };
+    }
+
+    const favorite = this.favoriteRepository.create({
+      user,
+      auction
+    });
+    await this.favoriteRepository.save(favorite);
+
+    return { message: '좋아요 등록 완료' };
   }
 }

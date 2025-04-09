@@ -15,9 +15,9 @@ export class Favorites {
     @ManyToOne(() => Auctions, (auction) => auction.id, { cascade: true, onDelete: "CASCADE" })
     auction: Auctions;
 
-    @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, { cascade: true, onDelete: "CASCADE" })
-    vehicle: Vehicles;
+    // @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, { cascade: true, onDelete: "CASCADE" })
+    // vehicle: Vehicles;
 
-    @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: "CASCADE" })
-    grade: Grades;
+    // @ManyToOne(() => Grades, (grade) => grade.id, { cascade: true, onDelete: "CASCADE" })
+    // grade: Grades;
 }
