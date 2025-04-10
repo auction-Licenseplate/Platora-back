@@ -117,7 +117,7 @@ export class AdminsService {
   }
   async bannerGet2(){
     return await this.bannerRepository.find({
-      select: ['banner_img'],
+      select: ['banner_img', 'banner_title'],
       take: 3 // 3개 제한
     });
   }
