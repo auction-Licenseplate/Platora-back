@@ -102,6 +102,7 @@ export class BoardsService {
     .createQueryBuilder('au')
     .innerJoin('au.vehicle', 'vehicle')
     .innerJoin('au.user', 'user')
+    .innerJoin('au.grade', 'grade')
     .where('user.id = :userId', { userId }) // 해당 사용자만
     .select([
       'au.final_price', // 최종가격
@@ -110,6 +111,7 @@ export class BoardsService {
       'au.end_time', // 종료시간
       'vehicle.car_img', // 차량 이미지
       'vehicle.plate_num', // 번호판(제목)
+      'grade.grade_name', // 등급명
     ])
     .getRawMany();
   }
