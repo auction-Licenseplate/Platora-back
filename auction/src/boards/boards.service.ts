@@ -60,6 +60,7 @@ export class BoardsService {
         'vehicle.title AS vehicleTitle', // 차량 제목
         'grade.grade_name AS gradeName', // 등급명
         'grade.min_price AS finalPrice', // 시작가
+        'grade.min_price AS minPrice', // 최저금액
         'vehicle.car_img AS carImage', // 차량 이미지
         'vehicle.car_info AS carInfo', // 차량 상세 정보
       ])
@@ -85,6 +86,7 @@ export class BoardsService {
         'user.name AS userName', // 판매자명
         'vehicle.title AS vehicleTitle', // 차량 제목
         'grade.grade_name AS gradeName', // 등급명
+        'grade.min_price AS minPrice', // 최저금액
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태
@@ -112,6 +114,7 @@ export class BoardsService {
       'vehicle.car_img', // 차량 이미지
       'vehicle.plate_num', // 번호판(제목)
       'grade.grade_name', // 등급명
+      'grade.min_price', // 최저금액
     ])
     .getRawMany();
   }
@@ -129,6 +132,7 @@ export class BoardsService {
         'user.name AS userName', // 판매자명
         'vehicle.title AS vehicleTitle', // 차량 제목
         'grade.grade_name AS gradeName', // 등급명
+        'grade.min_price AS minPrice', // 최저금액
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
         'auction.status AS status', // 경매 상태
@@ -219,6 +223,7 @@ export class BoardsService {
     await this.auctionRepository.save(auction);
 
     // 이전 사람의 point 환불 및 bid 환불데이터 저장 (누적)
+    let refundBid: Bids | null = null;  // 타입 명시
     if(preUserId && prePrice){
       const prevUser = await this.userRepository.findOne({where: {id: Number(preUserId)}})
 
@@ -226,13 +231,14 @@ export class BoardsService {
         prevUser.point! += prePrice;
         await this.userRepository.save(prevUser);
   
-        const refundBid = this.bidRepository.create({
+        refundBid = this.bidRepository.create({
           user: prevUser,
           auction,
-          refund_bid_price: prePrice
+          refund_bid_price: prePrice,
+          type: 'refund',
         });
 
-      await this.bidRepository.save(refundBid);
+        await this.bidRepository.save(refundBid);
       }
     }
 
@@ -241,10 +247,11 @@ export class BoardsService {
       user,
       auction,
       bid_price: price,
+      type: 'bid',
     });
     await this.bidRepository.save(newBid);
 
-    return {message: '최종입찰가 갱신/입찰기록 저장/포인트처리 완료', newBid};
+    return {message: '최종입찰가 갱신/입찰기록 저장/포인트처리 완료', newBid, refundBid};
   }
 
   // 좋아요 업데이트

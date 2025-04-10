@@ -41,8 +41,8 @@ export class PayController {
     }
 
     // 사용자 포인트 정보 전달
-    @UseGuards(JwtAuthGuard)
     @Get('/payInfo')
+    @UseGuards(JwtAuthGuard)
     async userPoint(@Req() req){
         const userId = req.user.id;
         return await this.payService.pointData(userId);

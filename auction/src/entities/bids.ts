@@ -19,6 +19,9 @@ export class Bids {
     @Column('int', {comment:'환불 가격', nullable: true})
     refund_bid_price: number;
 
+    @Column('varchar', { comment: '환불내역 구분', nullable: true })
+    type: string;
+
     @CreateDateColumn({ type: 'timestamp' }) 
     create_at: Date;
 }
