@@ -37,6 +37,7 @@ export class BoardsService {
         'vehicle.title AS vehicleTitle', // 차량 제목
         'vehicle.car_img AS imageUrl', // 차량 이미지
         'grade.grade_name AS gradeName', // 등급명
+        'grade.min_price AS minPrice', // 최저금액
         'auction.id As auctionID', // 경매 아이디 (PK)
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
@@ -216,19 +217,22 @@ export class BoardsService {
     await this.auctionRepository.save(auction);
 
     // 이전 사람의 point 환불 및 bid 환불데이터 저장 (누적)
-    // if(preUserId && prePrice){
-    //   const prevUser = await this.userRepository.findOne({where: {id: Number(preUserId)}})
+    if(preUserId && prePrice){
+      const prevUser = await this.userRepository.findOne({where: {id: Number(preUserId)}})
 
-    //   prevUser?.point += prePrice;
-    //   await this.userRepository.save(prevUser);
+      if(prevUser){
+        prevUser.point! += prePrice;
+        await this.userRepository.save(prevUser);
+  
+        const refundBid = this.bidRepository.create({
+          user: prevUser,
+          auction,
+          refund_bid_price: prePrice
+        });
 
-    //   const refundBid = this.bidRepository.create({
-    //     user: prevUser,
-    //     auction,
-    //     refund_bid_price: prePrice
-    //   });
-    //   await this.bidRepository.save(refundBid);
-    // }
+      await this.bidRepository.save(refundBid);
+      }
+    }
 
     // bid 경매데이터 저장 (입찰할 때마다 누적)
     const newBid = this.bidRepository.create({
