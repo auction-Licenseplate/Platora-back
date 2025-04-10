@@ -16,6 +16,9 @@ export class Bids {
     @Column('int', {comment:'현재 가격', nullable: true})
     bid_price: number;
 
+    @Column('int', {comment:'환불 가격', nullable: true})
+    refund_bid_price: number;
+
     @CreateDateColumn({ type: 'timestamp' }) 
     create_at: Date;
 }

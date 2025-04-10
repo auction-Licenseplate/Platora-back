@@ -152,6 +152,7 @@ export class BoardsService {
         'au.auction_num', // 경매번호
         'au.id', // 경매엔티티 PK
         'registerUser.name',
+        'registerUser.id', // 판매자 id
         'vehicle.car_info',
         'vehicle.car_img',
         'vehicle.plate_num', // 번호판
@@ -165,13 +166,17 @@ export class BoardsService {
       .createQueryBuilder('bid')
       .innerJoin('bid.user', 'user') // 입찰버튼 누른 사람
       .where('bid.auction = :auctionId', { auctionId })
-      .orderBy('bid.create_at', 'DESC')
+      .orderBy('bid.create_at', 'DESC') // 가장 최근
       .select([
-        'user.id', // 입찰자 id (PK)
-        'user.point', // 입찰자 포인트
-        'bid.bid_price' // 입찰가격
+        'user.id AS bidUser_Id', // 입찰자 id (PK)
+        'bid.bid_price AS bid_price' // 입찰가격
       ])
-      .getOne();
+      .getRawOne();
+    
+    const currentUser = await this.userRepository.findOne({
+      where: { id: Number(userId) },
+      select: ['point', 'id'],
+    })
 
     const favorite = await this.favoriteRepository
       .createQueryBuilder('fav')
@@ -183,14 +188,15 @@ export class BoardsService {
     return {
       data: result,
       isFavorite: favorite ? true : false,
-      userId,
+      currentUserPoint: currentUser?.point,
+      currentUserId: currentUser?.id,
       lastBid
     };
   }
 
   // 입찰 가격 갱신
-  async updatePrice(auctionId: number, price: number, userId: string){
-    // auctions에서 해당 경매 찾고 가격 갱신
+  async updatePrice(auctionId: number, price: number, userId: string, prePrice?: number, preUserId?: string){
+    // 해당 경매와 현재 입찰자 찾기
     const auction = await this.auctionRepository.findOne({where: {id: auctionId}});
     const user = await this.userRepository.findOne({ where: { id: Number(userId) } });
 
@@ -198,9 +204,31 @@ export class BoardsService {
       return { message: '경매 또는 유저 정보 없음' };
     }
 
+    // 현재 사람의 point 차감하기
+    if(user.point! < price) {
+      return { message: '포인트 부족함'}
+    }
+    user.point! -= price;
+    await this.userRepository.save(user);
+
     // auction 테이블의 최종 가격 갱신
     auction.final_price = price; 
     await this.auctionRepository.save(auction);
+
+    // 이전 사람의 point 환불 및 bid 환불데이터 저장 (누적)
+    // if(preUserId && prePrice){
+    //   const prevUser = await this.userRepository.findOne({where: {id: Number(preUserId)}})
+
+    //   prevUser?.point += prePrice;
+    //   await this.userRepository.save(prevUser);
+
+    //   const refundBid = this.bidRepository.create({
+    //     user: prevUser,
+    //     auction,
+    //     refund_bid_price: prePrice
+    //   });
+    //   await this.bidRepository.save(refundBid);
+    // }
 
     // bid 경매데이터 저장 (입찰할 때마다 누적)
     const newBid = this.bidRepository.create({
@@ -210,8 +238,7 @@ export class BoardsService {
     });
     await this.bidRepository.save(newBid);
 
-    return {message: '최종입찰가 갱신 / 입찰기록 저장 완료', newBid};
-    // + 이전 사람의 point는 환불해주고, 현재 사람의 point 차감하기
+    return {message: '최종입찰가 갱신/입찰기록 저장/포인트처리 완료', newBid};
   }
 
   // 좋아요 업데이트
