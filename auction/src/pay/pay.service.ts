@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Bids } from 'src/entities/bids';
 import { Payment } from 'src/entities/payment';
 import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
@@ -11,6 +12,8 @@ export class PayService {
         private payRepository: Repository<Payment>,
         @InjectRepository(Users)
         private userRepository: Repository<Users>,
+        @InjectRepository(Bids)
+        private bidRepository: Repository<Bids>
     ) {}
 
     // 환불할 포인트
@@ -79,7 +82,13 @@ export class PayService {
             where: {user: {id: userId}},
             select: ['amount', 'refund_amount', 'status', 'refund_status', 'point_minus', 'create_at']
         })
-        return { message: '포인트정보 전달 완료', payPoint} ;
+
+        const refundPoint = await this.bidRepository.find({
+            where: {user: {id: userId}},
+            select: ['bid_price', 'refund_bid_price', 'create_at']
+        })
+
+        return { message: '포인트정보 전달 완료', payPoint, refundPoint};
     }
 
     // 사용자 포인트 차감

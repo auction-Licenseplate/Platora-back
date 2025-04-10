@@ -55,7 +55,6 @@ export class BoardsController {
   // 입찰가 갱신
   @Post('/priceupdate')
   async postPrice(@Body() body: {id: number; price: number; userId: string; prePrice: number, preUserId: string}){
-    console.log(body,'어케오냐?');
     const { id, price, userId, prePrice, preUserId } = body;
     return await this.boardService.updatePrice(id, price, userId, prePrice, preUserId);
   }

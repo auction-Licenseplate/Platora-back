@@ -140,6 +140,7 @@ export class BoardsService {
         'vehicle.car_img AS carImage', // 차량 이미지
       ])
       .where('favUser.id = :userId', { userId }) // 해당 유저의 데이터만
+      .andWhere('favorite.status = true') // status 일치 조건만
       .getRawMany();
   }
 
