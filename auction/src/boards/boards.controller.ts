@@ -28,6 +28,13 @@ export class BoardsController {
     return await this.boardService.getPosts(userId, query);
   }
 
+  // 해당유저 게시글 전달
+  @Post('/userPosts')
+  async userDatas(@Body() body: {userId: string}) {
+    const {userId} = body;
+    return await this.boardService.userData(userId);
+  }
+
   // 관심상품
   @Get('/getMyFavorites')
   @UseGuards(JwtAuthGuard)
@@ -58,6 +65,4 @@ export class BoardsController {
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
-
-  // 좋아요 삭제
 }

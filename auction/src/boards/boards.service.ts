@@ -40,6 +40,7 @@ export class BoardsService {
         'auction.id As auctionID', // 경매 아이디 (PK)
         'auction.final_price AS finalPrice', // 최종 가격
         'auction.end_time AS endTime', // 종료 시간
+        'auction.start_time AS startTime', // 시작 시간
         'auction.status AS status', // 경매 상태
       ])
       .getRawMany(); // 결과 json 배열로 반환
@@ -92,6 +93,24 @@ export class BoardsService {
       .where('user.id = :userId', { userId }) // 해당 유저의 데이터
       .andWhere('auction.status IN (:...status)', { status: statusArray }) // status 조건 적용
       .getRawMany();
+  }
+
+  // 해당 유저 데이터 전달
+  async userData(userId: string) {
+    return await this.auctionRepository
+    .createQueryBuilder('au')
+    .innerJoin('au.vehicle', 'vehicle')
+    .innerJoin('au.user', 'user')
+    .where('user.id = :userId', { userId }) // 해당 사용자만
+    .select([
+      'au.final_price', // 최종가격
+      'au.auction_num', // 경매번호
+      'au.id', // 경매엔티티 PK
+      'au.end_time', // 종료시간
+      'vehicle.car_img', // 차량 이미지
+      'vehicle.plate_num', // 번호판(제목)
+    ])
+    .getRawMany();
   }
 
   // 관심상품 제공
