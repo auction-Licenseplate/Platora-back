@@ -61,6 +61,14 @@ export class AdminsController {
     return await this.adminService.saveBanner(text, file)
   }
 
+  // 배너 삭제
+  @Post('/guitar/imgdel')
+  async imgdelete(@Body() body: {title: string}){
+    console.log('삭제들간다', body);
+    const { title } = body;
+    return this.adminService.imgdel(title);
+  }
+
   // 경매 물품 전달
   @Get('/iteminfo')
   async auctionItem(){
@@ -76,7 +84,6 @@ export class AdminsController {
   // 회원탈퇴
   @Delete('/delete')
   async deleteUser(@Body() body: {email: string}){
-    console.log('삭제들간다', body)
     const { email } = body;
     return this.adminService.userDelete(email);
   }

@@ -153,6 +153,16 @@ export class AdminsService {
       .getRawMany();
   }
 
+  // 배너 삭제
+  async imgdel(title: string){
+    const banner = await this.bannerRepository.findOne({ where: {banner_title: title}})
+    if(!banner){
+      return {message: '해당 배너 없음'};
+    }
+    await this.bannerRepository.remove(banner);
+    return {message: '배너 삭제 완료'};
+  }
+
   // 경매 승인 
   async success(userId: number, plateNum: string){
     // 경매번호 랜덤생성
@@ -213,7 +223,7 @@ export class AdminsService {
         grade,
         auction_num: rnadomAuction,
         start_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3일 후
-        end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5), // 5일 후
+        end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 8), // 8일 후
         status: 'before',
       });
 
