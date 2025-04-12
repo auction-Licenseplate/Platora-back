@@ -2,11 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
+  app.use('/static', express.static(join(__dirname, '..', 'public')));
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:3001'], // 여러 도메인 허용
     credentials: true, // 쿠키 전송 허용
