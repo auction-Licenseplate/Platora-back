@@ -10,6 +10,7 @@ import { Admins } from 'src/entities/admins';
 @Module({
   imports: [TypeOrmModule.forFeature([Notifications, Users, Vehicles, Admins])],
   providers: [NotificationService],
-  controllers: [NotificationController]
+  controllers: [NotificationController],
+  exports: [NotificationService],
 })
 export class NotificationModule {}

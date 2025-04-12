@@ -8,6 +8,7 @@ import { Admins } from 'src/entities/admins';
 import { Auctions } from 'src/entities/auctions';
 import { Banners } from 'src/entities/banners';
 import { Bids } from 'src/entities/bids';
+import { NotificationService } from 'src/notification/notification.service';
 @Injectable()
 export class AdminsService {
   constructor(
@@ -24,7 +25,9 @@ export class AdminsService {
     @InjectRepository(Banners)
     private bannerRepository: Repository<Banners>,
     @InjectRepository(Bids)
-    private bidRepository: Repository<Bids>
+    private bidRepository: Repository<Bids>,
+
+    private notificationService: NotificationService,
   ) {}
 
   // 회원 관리
@@ -105,6 +108,9 @@ export class AdminsService {
       { user: { id: userId }, ownership_status: 'waiting' }, // 조건
       { ownership_status: 'approved' }, // 변경할 값
     );
+
+    // 승인 메일 전송
+    await this.notificationService.sendApprovalEmail(userId);
 
     return { userInfo1 };
   }

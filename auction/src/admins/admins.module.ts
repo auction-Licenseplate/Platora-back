@@ -9,8 +9,12 @@ import { Admins } from 'src/entities/admins';
 import { Auctions } from 'src/entities/auctions';
 import { Banners } from 'src/entities/banners';
 import { Bids } from 'src/entities/bids';
+import { NotificationModule } from 'src/notification/notification.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([Users, Vehicles, Payment, Admins, Auctions, Banners, Bids])],
+  imports: [
+    TypeOrmModule.forFeature([Users, Vehicles, Payment, Admins, Auctions, Banners, Bids]),
+    NotificationModule
+  ],
   providers: [AdminsService],
   controllers: [AdminsController],
 })

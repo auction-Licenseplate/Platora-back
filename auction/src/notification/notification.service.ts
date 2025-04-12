@@ -32,10 +32,10 @@ export class NotificationService {
         }
     })
 
-    // 공인인증서 오류 이메일 전송
+    // 공인인증서, 경매물품 거절 이메일 전송
     async sendTypeEmail(type: string, userId: number, valuetype: string, plate_num: string){
         const failMessageFile = {
-            '1': '공동인증서가 유효하지 않습니다.',
+            '1': '공인인증서가 유효하지 않습니다.',
             '2': '제출된 정보가 부족합니다.',
             '3': '관리자 판단에 따라 거절되었습니다.',
         };
@@ -59,12 +59,12 @@ export class NotificationService {
         if (valuetype === 'file') {
             message = failMessageFile[type];
             typeForDB = 'Certification';
-            subject = '[공동인증서 거절 안내]';
+            subject = '[공인인증서 거절 안내]';
 
             // vehicles 테이블 pending 상태로 변경
             const vehicle = await this.vehicleRepository.findOne({ where: {plate_num} });
             if(vehicle){
-                vehicle.ownership_status = 'pending';
+                vehicle.ownership_status = 'pendding';
                 await this.vehicleRepository.save(vehicle);
             }
 
@@ -78,7 +78,7 @@ export class NotificationService {
             if(vehicle){
                 const admin = await this.adminRepository.findOne({where: { vehicle: { id: vehicle.id } }});
                 if(admin){
-                    admin.write_status = 'pending';
+                    admin.write_status = 'pendding';
                     await this.adminRepository.save(admin);
                 }
             }
@@ -120,11 +120,50 @@ export class NotificationService {
             attachments: [
                 {
                   filename: 'logo.png',
-                  path: path.join(__dirname, '..', 'platoraLogo2.png'), // 절대 경로로 접근
+                  path: path.join(process.cwd(), 'public', 'platoraLogo2.png'),
                   cid: 'logo',
                 },
-              ],
+            ],
         });
         return {message: `${typeForDB} 거절 메일 전송 완료`};
+    }
+
+    // 공인인증서 승인 이메일 전송
+    async sendApprovalEmail(userId: number){
+        const user = await this.userRepository.findOne({ where: {id: userId}});
+        if(!user){
+            return {message: '사용자 없음'}
+        }
+
+        const subject = '[공인인증서 승인 안내]';
+        const message = '공인인증서가 정상적으로 승인되었습니다. 감사합니다.';
+
+        await this.transporter.sendMail({
+            from: `"관리자" <Platora-project>`,
+            to: user.email,
+            subject,
+            text: message,
+            html: `
+            <div style="padding:20px; font-family:'Noto Sans KR', sans-serif;">
+                <img src="cid:logo" style="width:120px; margin-bottom:20px;" />
+                <h2 style="color:#2E8B57;">Platora 인증 승인 안내</h2>
+                <p style="font-size:15px; color:#333;">
+                    안녕하세요, 고객님.<br/>
+                    귀하의 공인인증서가 정상적으로 <strong>승인</strong>되었습니다.
+                </p>
+                <p style="margin-top: 20px;">Platora 서비스를 이용해 주셔서 감사합니다.</p>
+                <hr style="margin-top:40px;"/>
+                <p style="font-size:12px; color:#aaa;">Platora Corp. | www.platora.com</p>
+            </div>
+            `,
+            attachments: [
+                {
+                  filename: 'logo.png',
+                  path: path.join(process.cwd(), 'public', 'platoraLogo2.png'),
+                  cid: 'logo',
+                },
+            ],
+        })
+        return { message: '공인인증서 승인 메일 전송 완료' };
     }
 }
