@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import { join } from 'path';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,11 +16,21 @@ async function bootstrap() {
     credentials: true, // 쿠키 전송 허용
   });
 
-  // 환경변수에서 포트 로드 (5000으로 수정)
+  const options = new DocumentBuilder()
+    .setTitle('Platora API 문서')
+    .setDescription('Platora 프로젝트를 위한 NestJS 기반 API 문서입니다.')
+    .setVersion('0.0.1')
+    .addTag('Platora') // 태그명 (옵션)
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document); // swagger 경로 지정
+
+  // 포트 설정 (5000으로 수정)
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 5000;
 
   await app.listen(port);
   console.log(`🚀 서버 실행중 http://localhost:${port}`);
+  console.log(`📚 Swagger 문서: http://localhost:${port}/api`);
 }
 bootstrap();
