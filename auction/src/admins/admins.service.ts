@@ -110,7 +110,11 @@ export class AdminsService {
     );
 
     // 승인 메일 전송
-    await this.notificationService.sendApprovalEmail(userId);
+    try {
+      await this.notificationService.sendApprovalEmail(userId);
+    } catch (error) {
+      console.error('이메일 전송 실패:', error);
+    }
 
     return { userInfo1 };
   }
@@ -243,7 +247,14 @@ export class AdminsService {
 
       await this.bidRepository.save(bidRecord);
 
+      // 5. 승인 이메일 전송
+      try {
+        await this.notificationService.sendApprovalEmail2(userId);
+      } catch (error) {
+        console.error('이메일 전송 실패2:', error);
+      }
     }
+    
     return { message: '경매 승인 성공' };
   }
 

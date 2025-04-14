@@ -166,4 +166,43 @@ export class NotificationService {
         })
         return { message: '공인인증서 승인 메일 전송 완료' };
     }
+
+    // 경매물품 승인 이메일 전송
+    async sendApprovalEmail2(userId: number){
+        const user = await this.userRepository.findOne({ where: {id: userId}});
+        if(!user){
+            return {message: '사용자 없음'}
+        }
+
+        const subject = '[경매물품 승인 안내]';
+        const message = '경매물품이 정상적으로 승인되었습니다. 감사합니다.';
+
+        await this.transporter.sendMail({
+            from: `"관리자" <Platora-project>`,
+            to: user.email,
+            subject,
+            text: message,
+            html: `
+            <div style="padding:20px; font-family:'Noto Sans KR', sans-serif;">
+                <img src="cid:logo" style="width:120px; margin-bottom:20px;" />
+                <h2 style="color:#2E8B57;">Platora 인증 승인 안내</h2>
+                <p style="font-size:15px; color:#333;">
+                    안녕하세요, 고객님.<br/>
+                    귀하의 경매물품이 정상적으로 <strong>승인</strong>되었습니다.
+                </p>
+                <p style="margin-top: 20px;">Platora 서비스를 이용해 주셔서 감사합니다.</p>
+                <hr style="margin-top:40px;"/>
+                <p style="font-size:12px; color:#aaa;">Platora Corp. | www.platora.com</p>
+            </div>
+            `,
+            attachments: [
+                {
+                  filename: 'logo.png',
+                  path: path.join(process.cwd(), 'public', 'platoraLogo2.png'),
+                  cid: 'logo',
+                },
+            ],
+        })
+        return { message: '경매물품 승인 메일 전송 완료' };
+    }
 }
