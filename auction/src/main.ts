@@ -20,7 +20,7 @@ async function bootstrap() {
     .setTitle('Platora API 문서')
     .setDescription('Platora 프로젝트를 위한 NestJS 기반 API 문서입니다.')
     .setVersion('0.0.1')
-    .addTag('Platora') // 태그명 (옵션)
+    .addTag('Platora') // 태그명
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document); // swagger 경로 지정

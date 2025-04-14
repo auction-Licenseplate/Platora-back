@@ -130,6 +130,7 @@ export class BoardsService {
       .innerJoin('favorite.user', 'favUser')
       .select([
         'user.name AS userName', // 판매자명
+        'user.id AS userId', // 판매자 PK
         'vehicle.title AS vehicleTitle', // 차량 제목
         'grade.grade_name AS gradeName', // 등급명
         'grade.min_price AS minPrice', // 최저금액

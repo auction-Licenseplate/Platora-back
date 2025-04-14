@@ -1,18 +1,18 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { LocalLoginDto } from 'src/dtos/local-login.dto';
+import { SocialLoginDto } from 'src/dtos/social-login.dto';
+import { FindIdDto } from 'src/dtos/find-id.dto';
+import { FindPasswordDto } from 'src/dtos/find-pwd.dto';
+import { UpdatePasswordDto } from 'src/dtos/update-pwd.dto';
+import { PlusInfoDto } from 'src/dtos/plus-info.dto';
+import { CheckDuplicateDto } from 'src/dtos/check-duplicate.dto';
+import { SocialPhoneCheckDto } from 'src/dtos/social-phon-check.dto';
+import { SignUpDto } from 'src/dtos/signup.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,45 +20,36 @@ export class AuthController {
 
   // 회원가입 API
   @Post('/signup')
-  async signUp(
-    @Body()
-    body: {
-      email: string;
-      password: string;
-      name: string;
-      phone: string;
-    },
-  ) {
-    return this.authService.signUp(
-      body.email,
-      body.password,
-      body.name,
-      body.phone,
-    );
+  @ApiOperation({ summary: '회원가입' })
+  @ApiBody({ type: SignUpDto })
+  async signUp(@Body() body: SignUpDto) {
+    const { email, password, name, phone } = body;
+    return this.authService.signUp(email, password, name, phone);
   }
 
   // 로컬 로그인 API
   @Post('/login')
   @UseGuards(AuthGuard('local'))
+  @ApiOperation({ summary: '로컬 로그인' })
+  @ApiBody({ type: LocalLoginDto})
   async login(@Req() req: any, @Res() res: any) {
     const { id, email, token } = req.user;
-    console.log(token);
     if (!token) {
       return { message: '로그인 실패' };
     }
-    // 쿠키에 토큰 저장
-    res.cookie('accessToken', token, {
+    
+    res.cookie('accessToken', token, { // 쿠키에 토큰 저장
       // httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
 
-    // 로그인 성공 응답
     return res.json({ message: '로그인 성공', id, email, token });
   }
 
   // 쿠키에서 토큰 꺼내기
   @Get('/tokenCheck')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
   async tokenCheck(@Req() req: Request) {
     // console.log("req.user 정보:", req.user);
     if (!req.cookies || !req.cookies.accessToken) {
@@ -70,30 +61,33 @@ export class AuthController {
   // 카카오 로그인 API
   @Get('/kakao')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoLogin(@Req() req: Request) {
-    // 카카오 로그인 페이지로 자동 리다이렉트
-  }
+  @ApiOperation({ summary: '카카오 로그인 (리다이렉트)' })
+  async kakaoLogin(@Req() req: Request) {}
 
   // 네이버 로그인 API
   @Get('/naver')
   @UseGuards(AuthGuard('naver'))
-  async naverLogin(@Req() req: Request) {
-    // 네이버 로그인 페이지로 자동 리다이렉트
-  }
+  @ApiOperation({ summary: '네이버 로그인 (리다이렉트)' })
+  async naverLogin(@Req() req: Request) {}
 
   // 구글 로그인 API
   @Get('/google')
   @UseGuards(AuthGuard('google'))
-  async googleLogin(): Promise<void> {
-    // 구글 로그인 페이지로 자동 리다이렉트
-  }
+  @ApiOperation({ summary: '구글 로그인 (리다이렉트)' })
+  async googleLogin(): Promise<void> {}
 
   // sns 로그인 타입 구별
   @Post('login/:type')
+  @ApiOperation({
+    summary: 'SNS 로그인 완료 (토큰 발급)',
+    description: 'SNS 로그인 API 사용'
+  })
+  @ApiParam({ name: 'type', enum: ['kakao', 'naver', 'google'] })
+  @ApiBody({ type: SocialLoginDto })
   async socialLogin(
     @Param('type') type: string,
     @Res() res: Response,
-    @Body() body: { code: string },
+    @Body() body: SocialLoginDto,
   ) {
     // console.log(`프론트에서 받은타입 ${type}`);
     // console.log(`프론트에서 받은코드 ${body.code}`);
@@ -128,12 +122,16 @@ export class AuthController {
 
   // 아이디 찾기
   @Post('/findID')
+  @ApiOperation({ summary: '아이디 찾기' })
+  @ApiBody({ type: FindIdDto })
   async userID(@Body() body: { name: string; phone: string }) {
     return await this.authService.findId(body.name, body.phone);
   }
 
   // 비밀번호 찾기
   @Post('/findpw')
+  @ApiOperation({ summary: '비밀번호 찾기' })
+  @ApiBody({ type: FindPasswordDto })
   async userPW(@Body() body) {
     const { email, phone } = body;
     return await this.authService.findPW(email, phone);
@@ -141,6 +139,8 @@ export class AuthController {
 
   // 새 비밀번호 저장
   @Post('/pwfind/updatepw')
+  @ApiOperation({ summary: '비밀번호 재설정' })
+  @ApiBody({ type: UpdatePasswordDto })
   async pwFinde(@Body() body: { password: string; userID: number }) {
     return this.authService.updatePW(body.userID, body.password);
   }
@@ -158,14 +158,19 @@ export class AuthController {
 
   // 소셜로그인 추가 입력
   @Post('/social/plusinfo')
-  async socialPlus(@Body() body) {
+  @ApiOperation({ summary: '소셜 로그인 추가정보 입력' })
+  @ApiBody({ type: PlusInfoDto })
+  async socialPlus(@Body() body: PlusInfoDto) {
     const { userID, name, phone } = body;
     return await this.authService.plusInfo(userID, name, phone);
   }
 
   // 회원가입 이메일, 번호 중복검사
   @Post('/check/:type')
-  async duplicateData(@Param('type') type: string, @Body() body) {
+  @ApiOperation({ summary: '회원가입 이메일 또는 번호 중복 검사' })
+  @ApiParam({ name: 'type', enum: ['email', 'phone'], description: '중복 검사 종류' })
+  @ApiBody({ type: CheckDuplicateDto })
+  async duplicateData(@Param('type') type: string, @Body() body: CheckDuplicateDto) {
     const { email, phone } = body;
 
     let valueToCheck;
@@ -180,9 +185,11 @@ export class AuthController {
     return await this.authService.duplicateCheck(type, valueToCheck);
   }
 
-  // 소셜로그인 번호 중복검사
+  // 소셜로그인 추가입력 번호 중복검사
   @Post('/phoneCheck')
-  async socialDuplicate(@Body() body){
+  @ApiOperation({ summary: '소셜 로그인 전화번호 중복 검사' })
+  @ApiBody({ type: SocialPhoneCheckDto })
+  async socialDuplicate(@Body() body: SocialPhoneCheckDto){
     const valueToCheck = body;
     return this.authService.socialDuplicateCheck(valueToCheck);
   }
