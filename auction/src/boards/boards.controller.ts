@@ -65,4 +65,10 @@ export class BoardsController {
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
+
+  // 대시보드 정보 전달
+  @Get('/getInfo')
+  async getInfos(@Query() query){
+    return await this.boardService.dashInfo(query);
+  }
 }

@@ -21,6 +21,17 @@ async function bootstrap() {
     .setDescription('Platora 프로젝트를 위한 NestJS 기반 API 문서입니다.')
     .setVersion('0.0.1')
     .addTag('Platora') // 태그명
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'accessToken', // 스키마 정의
+    )
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document); // swagger 경로 지정

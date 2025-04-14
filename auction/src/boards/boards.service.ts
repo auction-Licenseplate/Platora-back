@@ -293,4 +293,21 @@ export class BoardsService {
 
     return { message: '좋아요 등록 완료', status: true };
   }
+
+  // 대시보드 정보 전달
+  async dashInfo(query: any){
+    return await this.auctionRepository
+      .createQueryBuilder('auction')
+      .leftJoin('auction.bids', 'bid')
+      .select([
+        'auction.auction_num',
+        'auction.final_price',
+        'auction.end_time',
+        'bid.auctionId AS bid_auctionId',
+        'bid.create_at AS bid_createAt',
+        'bid.bid_price AS bid_price',
+      ])
+      .orderBy('auction.id', 'DESC')
+      .getRawMany()
+  }
 }

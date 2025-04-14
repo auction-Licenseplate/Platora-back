@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { LocalLoginDto } from 'src/dtos/local-login.dto';
 import { SocialLoginDto } from 'src/dtos/social-login.dto';
 import { FindIdDto } from 'src/dtos/find-id.dto';
@@ -50,6 +50,7 @@ export class AuthController {
   @Get('/tokenCheck')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
+  @ApiResponse({ status: 200, description: '로그인 유지됨' })
   async tokenCheck(@Req() req: Request) {
     // console.log("req.user 정보:", req.user);
     if (!req.cookies || !req.cookies.accessToken) {
