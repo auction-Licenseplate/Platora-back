@@ -21,6 +21,7 @@ export class UsersController {
     // 사용자 정보 자동 출력
     @Get('/user-info')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth('accessToken')
     @ApiOperation({ summary: '사용자 마이페이지 정보 조회' })
     @ApiResponse({ status: 200, type: UserInfoResponseDto })
     async userInfo(@Req() req: AuthRequest) {
@@ -31,6 +32,7 @@ export class UsersController {
     // 비밀번호 변경 가능 여부 확인
     @Get('/passCheck')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('accessToken')
     @ApiOperation({ summary: '비밀번호 변경 가능 여부 확인' })
     @ApiResponse({ status: 200, type: PasswordCheckResponseDto })
     async passwordCheck(@Req() req) {
@@ -51,6 +53,7 @@ export class UsersController {
     // 회원 탈퇴
     @Delete('/withdraw')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('accessToken')
     @ApiOperation({ summary: '회원 탈퇴' })
     @ApiResponse({ status: 200, description: '회원 탈퇴 완료' })
     async userDelete(@Req() req){
@@ -59,9 +62,9 @@ export class UsersController {
     }
 
     // 공인인증서 저장
-    @ApiBearerAuth('accessToken')
     @Post('/certificate')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('accessToken')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: join(__dirname, '../../uploads'), // 저장할 경로

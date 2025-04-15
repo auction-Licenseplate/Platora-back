@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { LocalLoginDto } from 'src/dtos/local-login.dto';
 import { SocialLoginDto } from 'src/dtos/social-login.dto';
 import { FindIdDto } from 'src/dtos/find-id.dto';
@@ -51,6 +51,7 @@ export class AuthController {
   // 쿠키에서 토큰 꺼내기
   @Get('/tokenCheck')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
   @ApiResponse({ status: 200, schema:{ example: {message: '로그인 유지됨', token: '발급받은 jwt token'}}})
   async tokenCheck(@Req() req: Request) {

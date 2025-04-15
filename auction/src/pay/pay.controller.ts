@@ -3,6 +3,7 @@ import { PayService } from './pay.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RefundPointDto } from 'src/dtos/refund-point.dto';
+import { TossPayDto } from 'src/dtos/toss-pay.dto';
 
 @Controller('pay')
 export class PayController {
@@ -61,7 +62,7 @@ export class PayController {
     @ApiResponse({ status: 200, 
         schema: {example: {message: '결제정보 저장완료', payment: {amount: 10000, payment_method: '카드', status: 'paid'}}}
     })
-    async tossSave(@Req() req, @Body() body: any ){
+    async tossSave(@Req() req, @Body() body: TossPayDto ){
         const userId = req.user.id;
         return await this.payService.tossSave(userId, body);
     }
@@ -69,6 +70,30 @@ export class PayController {
     // 사용자 포인트 정보 전달
     @Get('/payInfo')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: '사용자 포인트 정보 조회' })
+    @ApiResponse({ status: 200, schema: {
+        example: {
+            message: '포인트정보 전달 완료',
+            payPoint: [
+                {
+                    amount: 10000,
+                    refund_amount: 1100,
+                    status: 'paid',
+                    refund_status: 'waiting',
+                    point_minus: 100,
+                    create_at: '2025-04-14T00:00:00.000Z',
+                }
+            ],
+            refundPoint: [
+                {
+                    bid_price: 5000,
+                    refund_bid_price: null,
+                    create_at: '2025-04-13T00:00:00.000Z',
+                }
+            ]
+        }
+    }})
     async userPoint(@Req() req){
         const userId = req.user.id;
         return await this.payService.pointData(userId);
@@ -77,6 +102,9 @@ export class PayController {
     // 포인트 차감
     @Post('/pointminus')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: '포인트 100 차감' })
+    @ApiResponse({ status: 200, description: '포인트 차감 성공' })
     async userPointMins(@Req() req) {
         const userId = req.user.id;
         return await this.payService.pointDelete(userId);

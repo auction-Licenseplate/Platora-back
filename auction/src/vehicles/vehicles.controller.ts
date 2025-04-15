@@ -14,6 +14,7 @@ import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('vehicles')
 export class VehiclesController {
@@ -22,6 +23,9 @@ export class VehiclesController {
   // 차량 정보 가져오기
   @UseGuards(JwtAuthGuard)
   @Get('/vehicleData')
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '차량 정보 가져오기' })
+  // @ApiResponse({ status: 200, })
   async carOwnership(@Req() req) {
     const userId = req.user.id;
     return await this.vehicleService.getCarData(userId);

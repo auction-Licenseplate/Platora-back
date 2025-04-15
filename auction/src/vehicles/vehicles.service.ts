@@ -17,6 +17,7 @@ export class VehiclesService {
     private readonly adminsRepository: Repository<Admins>,
   ) {}
 
+  // 차량 정보 전달
   async getCarData(userId: number) {
     return this.vehicleRepository.find({
       where: { user: { id: userId } },
