@@ -199,4 +199,12 @@ export class AuthController {
     const valueToCheck = body;
     return this.authService.socialDuplicateCheck(valueToCheck);
   }
+
+  // 관리자 역할 확인
+  @Get('/getRole')
+  @UseGuards(JwtAuthGuard)
+  async userRole(@Req() req){
+    const userId = req.user.id;
+    return this.authService.getUserRole(userId);
+  }
 }

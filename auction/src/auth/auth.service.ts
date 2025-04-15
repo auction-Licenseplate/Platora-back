@@ -316,4 +316,13 @@ export class AuthService {
     const user = await this.userRepository.findOne({ where: {phone: valueToCheck.phone}});
     return {message: '사용 가능', exists: !!user};
   }
+
+  // 관리자 역할 확인
+  async getUserRole(userId: number){
+    const user = await this.userRepository.findOne({
+      where: {id: userId},
+      select: ['role']
+    });
+    return user?.role;
+  }
 }

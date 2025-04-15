@@ -8,11 +8,8 @@ export class NotificationController {
     constructor(private readonly notificationService: NotificationService) {}
     // 공인인증서, 경매물품 거절 이메일
     @Post('/failvalue')
-    @ApiOperation({
-        summary: '거절 이메일 전송',
-        description: ''
-    })
-    @ApiResponse({ status: 201, description: '이메일 전송 완료' })
+    @ApiOperation({ summary: '거절 이메일 전송'})
+    @ApiResponse({ status: 200, description: '거절 메일 전송 완료' })
     async sendEmail(@Body() body: SendFailEmailDto){
         const {type, userId, valuetype, plate} = body;
         return this.notificationService.sendTypeEmail(type, userId, valuetype, plate);
