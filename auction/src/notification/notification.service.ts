@@ -64,7 +64,7 @@ export class NotificationService {
             // vehicles 테이블 pending 상태로 변경
             const vehicle = await this.vehicleRepository.findOne({ where: {plate_num} });
             if(vehicle){
-                vehicle.ownership_status = 'pendding';
+                vehicle.ownership_status = 'pending';
                 await this.vehicleRepository.save(vehicle);
             }
 
@@ -78,7 +78,7 @@ export class NotificationService {
             if(vehicle){
                 const admin = await this.adminRepository.findOne({where: { vehicle: { id: vehicle.id } }});
                 if(admin){
-                    admin.write_status = 'pendding';
+                    admin.write_status = 'pending';
                     await this.adminRepository.save(admin);
                 }
             }

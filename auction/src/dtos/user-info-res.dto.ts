@@ -13,6 +13,6 @@ export class UserInfoResponseDto {
     @ApiProperty({ example: 1000, description: '포인트' })
     point: number;
 
-    @ApiProperty({ example: 'local', description: '회원가입 방식' })
+    @ApiProperty({ example: 'kakao', description: '회원가입 방식' })
     provider: string;
 }

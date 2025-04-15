@@ -21,7 +21,7 @@ export class AuthController {
   // 회원가입 API
   @Post('/signup')
   @ApiOperation({ summary: '회원가입' })
-  @ApiBody({ type: SignUpDto })
+  @ApiResponse({ status: 200, schema:{ example: {message: '회원가입 성공', userEmail: 'user@example.com'}} })
   async signUp(@Body() body: SignUpDto) {
     const { email, password, name, phone } = body;
     return this.authService.signUp(email, password, name, phone);
@@ -32,6 +32,9 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @ApiOperation({ summary: '로컬 로그인' })
   @ApiBody({ type: LocalLoginDto})
+  @ApiResponse({ status: 200,
+    schema:{ example: {message: '로그인 성공', id: 1, email: 'user@example.com', token: '발급받은 jwt token'}} 
+  })
   async login(@Req() req: any, @Res() res: any) {
     const { id, email, token } = req.user;
     if (!token) {
@@ -42,7 +45,6 @@ export class AuthController {
       // httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
-
     return res.json({ message: '로그인 성공', id, email, token });
   }
 
@@ -50,7 +52,7 @@ export class AuthController {
   @Get('/tokenCheck')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
-  @ApiResponse({ status: 200, description: '로그인 유지됨' })
+  @ApiResponse({ status: 200, schema:{ example: {message: '로그인 유지됨', token: '발급받은 jwt token'}}})
   async tokenCheck(@Req() req: Request) {
     // console.log("req.user 정보:", req.user);
     if (!req.cookies || !req.cookies.accessToken) {
@@ -83,8 +85,13 @@ export class AuthController {
     summary: 'SNS 로그인 완료 (토큰 발급)',
     description: 'SNS 로그인 API 사용'
   })
-  @ApiParam({ name: 'type', enum: ['kakao', 'naver', 'google'] })
-  @ApiBody({ type: SocialLoginDto })
+  @ApiParam({ name: 'type', enum: ['kakao', 'naver', 'google'], description: 'SNS 플랫폼 종류' })
+  @ApiResponse({status: 200, 
+    schema: {example: {
+      user: {id: 1, email: 'user@example.com', provider: 'kakao'},
+      token: {accessToken: 'jwt.access.token...', refreshToken: 'jwt.refresh.token...',}
+    }}
+  })
   async socialLogin(
     @Param('type') type: string,
     @Res() res: Response,
@@ -125,6 +132,7 @@ export class AuthController {
   @Post('/findID')
   @ApiOperation({ summary: '아이디 찾기' })
   @ApiBody({ type: FindIdDto })
+  @ApiResponse({ status: 200, schema: {example: {email: 'user@example.com'}}})
   async userID(@Body() body: { name: string; phone: string }) {
     return await this.authService.findId(body.name, body.phone);
   }
@@ -132,8 +140,8 @@ export class AuthController {
   // 비밀번호 찾기
   @Post('/findpw')
   @ApiOperation({ summary: '비밀번호 찾기' })
-  @ApiBody({ type: FindPasswordDto })
-  async userPW(@Body() body) {
+  @ApiResponse({ status: 200, schema: {example: {userID: 1}}})
+  async userPW(@Body() body: FindPasswordDto) {
     const { email, phone } = body;
     return await this.authService.findPW(email, phone);
   }
@@ -142,6 +150,7 @@ export class AuthController {
   @Post('/pwfind/updatepw')
   @ApiOperation({ summary: '비밀번호 재설정' })
   @ApiBody({ type: UpdatePasswordDto })
+  @ApiResponse({ status: 200, description: '새 비밀번호 저장 성공'})
   async pwFinde(@Body() body: { password: string; userID: number }) {
     return this.authService.updatePW(body.userID, body.password);
   }
@@ -160,7 +169,7 @@ export class AuthController {
   // 소셜로그인 추가 입력
   @Post('/social/plusinfo')
   @ApiOperation({ summary: '소셜 로그인 추가정보 입력' })
-  @ApiBody({ type: PlusInfoDto })
+  @ApiResponse({ status: 200, description: '소셜로그인 추가정보 저장 성공'})
   async socialPlus(@Body() body: PlusInfoDto) {
     const { userID, name, phone } = body;
     return await this.authService.plusInfo(userID, name, phone);
@@ -170,18 +179,13 @@ export class AuthController {
   @Post('/check/:type')
   @ApiOperation({ summary: '회원가입 이메일 또는 번호 중복 검사' })
   @ApiParam({ name: 'type', enum: ['email', 'phone'], description: '중복 검사 종류' })
-  @ApiBody({ type: CheckDuplicateDto })
+  @ApiResponse({ status: 200, schema: {example: {message: '사용 가능', type: 'email', exists: false}}})
   async duplicateData(@Param('type') type: string, @Body() body: CheckDuplicateDto) {
     const { email, phone } = body;
-
     let valueToCheck;
 
-    if (type === 'email') {
-      valueToCheck = email;
-    }
-    if (type === 'phone') {
-      valueToCheck = phone;
-    }
+    if (type === 'email') valueToCheck = email;
+    if (type === 'phone') valueToCheck = phone;
 
     return await this.authService.duplicateCheck(type, valueToCheck);
   }
@@ -189,7 +193,7 @@ export class AuthController {
   // 소셜로그인 추가입력 번호 중복검사
   @Post('/phoneCheck')
   @ApiOperation({ summary: '소셜 로그인 전화번호 중복 검사' })
-  @ApiBody({ type: SocialPhoneCheckDto })
+  @ApiResponse({ status: 200, schema: {example: {message: '사용 가능', exists: false}}})
   async socialDuplicate(@Body() body: SocialPhoneCheckDto){
     const valueToCheck = body;
     return this.authService.socialDuplicateCheck(valueToCheck);

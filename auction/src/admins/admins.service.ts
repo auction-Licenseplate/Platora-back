@@ -158,8 +158,10 @@ export class AdminsService {
         'u.email',
         'u.id',
         'u.name',
+        'a.write_status'
       ])
       .innerJoin('v.user', 'u')
+      .leftJoin('admins', 'a', 'a.vehicleId = v.id')
       .getRawMany();
   }
 
@@ -235,6 +237,7 @@ export class AdminsService {
         start_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3일 후
         end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 8), // 8일 후
         status: 'before',
+        final_price: grade?.min_price
       });
 
       await this.auctionRepository.save(auctionRecord);

@@ -43,6 +43,7 @@ export class UsersController {
     @Post('/userCheck')
     @ApiOperation({ summary: '이용약관 체크' })
     @ApiBody({ type: AgreeCheckDto})
+    @ApiResponse({ status: 200, description: '이용약관 저장 완료' })
     async agreeCheck(@Body() body: AgreeCheckDto){
         return await this.userService.userAgree(body.user_email, body.term);
     }
@@ -51,6 +52,7 @@ export class UsersController {
     @Delete('/withdraw')
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: '회원 탈퇴' })
+    @ApiResponse({ status: 200, description: '회원 탈퇴 완료' })
     async userDelete(@Req() req){
         const user = req.user;
         return await this.userService.userOut(user.id);
@@ -74,19 +76,21 @@ export class UsersController {
         schema: {
             type: 'object',
             properties: {
-                grade: { type: 'string', example: '10' },
-                score: { type: 'string', example: '10' },
-                price: { type: 'string', example: '100000'},
-                vehicleNumber: { type: 'string', example: '12가3456' },
+                grade: { type: 'string', example: '10', description: '등급명' },
+                score: { type: 'string', example: '10', description: '점수' },
+                price: { type: 'string', example: '100000', description: '최소가격' },
+                vehicleNumber: { type: 'string', example: '12가3456', description: '차량 번호' },
                 file: {
                     type: 'string',
                     format: 'binary', // Swagger에 파일 업로드 필드로 인식
+                    description: '공인인증서 파일'
                 }
             }
         }
     })
     @ApiOperation({ summary: '공인인증서(파일), 등급, 차량번호 저장' })
-    async saveCertification(@UploadedFile() file: Express.Multer.File, @Body() body, @Req() req){
+    @ApiResponse({ status: 200, description: '인증 업로드 및 등급저장 성공' })
+    async saveCertification(@UploadedFile() file: Express.Multer.File, @Body() body: any, @Req() req){
         if (!file) {
             return { message: '파일 없음' };
         }
