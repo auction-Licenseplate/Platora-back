@@ -7,6 +7,9 @@ import { MyPostResponseDto } from 'src/dtos/mypots.dto';
 import { ApprovedPostDto } from 'src/dtos/post.dto';
 import { FavoriteDto } from 'src/dtos/favorite.dto';
 import { UserPostResponseDto } from 'src/dtos/user-posts.dto';
+import { DetailResponseDto } from 'src/dtos/detail-item.dto';
+import { UpdatePriceDto } from 'src/dtos/update-price.dto';
+import { UpdatePriceResponseDto } from 'src/dtos/update-price-res.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -68,6 +71,10 @@ export class BoardsController {
   // 상세페이지 정보 전달
   @Post('/detail')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '상세페이지 정보 전달' })
+  @ApiBody({ schema: {example: {id: '1'}, description: '조회할 경매 게시글 Id (PK)'}})
+  @ApiResponse({ status: 200, type: DetailResponseDto })
   async detailPage(@Body() body: {id: string}, @Req() req){
     const { id } = body;
     const userId = req.user.id
@@ -76,7 +83,9 @@ export class BoardsController {
 
   // 입찰가 갱신
   @Post('/priceupdate')
-  async postPrice(@Body() body: {id: number; price: number; userId: string; prePrice: number, preUserId: string}){
+  @ApiOperation({ summary: '입찰가 갱신' })
+  @ApiResponse({ status: 200, type: UpdatePriceResponseDto })
+  async postPrice(@Body() body: UpdatePriceDto){
     const { id, price, userId, prePrice, preUserId } = body;
     return await this.boardService.updatePrice(id, price, userId, prePrice, preUserId);
   }
