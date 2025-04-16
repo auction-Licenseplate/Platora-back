@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Admins } from 'src/entities/admins';
 import { Bids } from 'src/entities/bids';
 import { Users } from 'src/entities/users.entity';
+import { Alerts } from 'src/entities/alert';
 
 @Injectable()
 export class BoardsService {
@@ -22,7 +23,9 @@ export class BoardsService {
     @InjectRepository(Bids)
     private bidRepository: Repository<Bids>,
     @InjectRepository(Users)
-    private userRepository: Repository<Users>
+    private userRepository: Repository<Users>,
+    @InjectRepository(Alerts)
+    private alertRepository: Repository<Alerts>
   ) {}
 
   // 모든 게시글 정보 제공
@@ -158,6 +161,7 @@ export class BoardsService {
       .select([
         'au.final_price',
         'au.end_time',
+        'au.start_time',
         'au.auction_num', // 경매번호
         'au.id', // 경매엔티티 PK
         'registerUser.name',
@@ -206,7 +210,10 @@ export class BoardsService {
   // 입찰 가격 갱신
   async updatePrice(auctionId: number, price: number, userId: string, prePrice?: number, preUserId?: string){
     // 해당 경매와 현재 입찰자 찾기
-    const auction = await this.auctionRepository.findOne({where: {id: auctionId}});
+    const auction = await this.auctionRepository.findOne({
+      where: {id: auctionId},
+      relations: ['vehicle'],
+    });
     const user = await this.userRepository.findOne({ where: { id: Number(userId) } });
 
     if (!auction || !user) {
@@ -241,6 +248,14 @@ export class BoardsService {
         });
 
         await this.bidRepository.save(refundBid);
+
+        // alert에 환불 데이터 저장
+        const refundAlert = this.alertRepository.create({
+          user: prevUser,
+          vehicle: auction.vehicle,
+          message: refundBid.type,
+        })
+        await this.alertRepository.save(refundAlert);
       }
     }
 
@@ -252,6 +267,14 @@ export class BoardsService {
       type: 'bid',
     });
     await this.bidRepository.save(newBid);
+
+    // alert에 입찰 데이터 저장
+    const bidAlert = this.alertRepository.create({
+      user,
+      vehicle: auction.vehicle,
+      message: newBid.type
+    })
+    await this.alertRepository.save(bidAlert);
 
     return {message: '최종입찰가 갱신/입찰기록 저장/포인트처리 완료', newBid, refundBid};
   }

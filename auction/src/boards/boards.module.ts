@@ -9,9 +9,10 @@ import { Favorites } from 'src/entities/favorites';
 import { Admins } from 'src/entities/admins';
 import { Bids } from 'src/entities/bids';
 import { Vehicles } from 'src/entities/vehicles';
+import { Alerts } from 'src/entities/alert';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ Users, Grades, Auctions, Favorites, Admins, Vehicles, Bids])],
+  imports: [TypeOrmModule.forFeature([ Users, Grades, Auctions, Favorites, Admins, Vehicles, Bids, Alerts])],
   providers: [BoardsService],
   controllers: [BoardsController],
 })

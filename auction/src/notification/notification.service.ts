@@ -7,6 +7,7 @@ import * as nodemailer from 'nodemailer';
 import { Vehicles } from 'src/entities/vehicles';
 import { Admins } from 'src/entities/admins';
 import * as path from 'path';
+import { Alerts } from 'src/entities/alert';
 
 @Injectable()
 export class NotificationService {
@@ -18,7 +19,9 @@ export class NotificationService {
         @InjectRepository(Vehicles)
         private vehicleRepository: Repository<Vehicles>,
         @InjectRepository(Admins)
-        private adminRepository: Repository<Admins>
+        private adminRepository: Repository<Admins>,
+        @InjectRepository(Alerts)
+        private alertRepository: Repository<Alerts>,
     ) {}
 
     private transporter = nodemailer.createTransport({
@@ -204,5 +207,36 @@ export class NotificationService {
             ],
         })
         return { message: '경매물품 승인 메일 전송 완료' };
+    }
+
+    // 알림 정보 전달
+    async sendAlertData(userId: number){
+        const alerts = await this.alertRepository.find({
+            where: {user: {id: userId}},
+            relations: ['vehicle'],
+            order: { created_at: 'DESC'},
+        });
+
+        // 필요한 데이터
+        return alerts.map(x =>({
+            id: x.id,
+            message: x.message,
+            check: x.check,
+            created_at: x.created_at,
+            vehicleTitle: x.vehicle ? x.vehicle.title : null,
+        }));
+    }
+
+    // 읽음 처리 업데이트
+    async alertChkUpdate(id: number, check: boolean){
+        const alert = await this.alertRepository.findOne({ where: {id} })
+        if(!alert){
+            return {message: '해당 알림 없음'}
+        }
+
+        alert.check = check;
+        await this.alertRepository.save(alert);
+
+        return { message: '알림 변경 완료'};
     }
 }

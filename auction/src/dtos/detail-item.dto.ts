@@ -7,6 +7,9 @@ export class DetailItemDto {
     @ApiProperty({ example: '2025-05-01T12:00:00.000Z', description: '종료 시간' })
     au_end_time: string;
 
+    @ApiProperty({ example: '2025-05-06T12:00:00.000Z', description: '시작 시간' })
+    au_start_time: string;
+
     @ApiProperty({ example: 'AUC-2024-001', description: '경매 번호' })
     au_auction_num: string;
 
