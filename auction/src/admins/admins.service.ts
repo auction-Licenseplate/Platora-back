@@ -101,7 +101,7 @@ export class AdminsService {
     return { message: '환불 상태 변경 완료'};
   }
 
-  //공동인증서 승인
+  //공인인증서 승인
   async pendding(userId: number) {
     // 승인 상태 업데이트
     const userInfo1 = await this.vehicleRepository.update(

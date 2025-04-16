@@ -295,7 +295,7 @@ export class BoardsService {
   }
 
   // 대시보드 정보 전달
-  async dashInfo(query: any){
+  async dashInfo(){
     return await this.auctionRepository
       .createQueryBuilder('auction')
       .leftJoin('auction.bids', 'bid')

@@ -23,7 +23,6 @@ import { Payment } from './entities/payment';
 import { Favorites } from './entities/favorites';
 import { Admins } from './entities/admins';
 import { Notifications } from './entities/notifications';
-import { Role } from './entities/role';
 import { Bids } from './entities/bids';
 import { Banners } from './entities/banners';
 
@@ -55,7 +54,6 @@ import { Banners } from './entities/banners';
         Favorites,
         Admins,
         Notifications,
-        Role,
         Bids,
         Banners
       ],

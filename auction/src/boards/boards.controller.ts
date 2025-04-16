@@ -10,6 +10,8 @@ import { UserPostResponseDto } from 'src/dtos/user-posts.dto';
 import { DetailResponseDto } from 'src/dtos/detail-item.dto';
 import { UpdatePriceDto } from 'src/dtos/update-price.dto';
 import { UpdatePriceResponseDto } from 'src/dtos/update-price-res.dto';
+import { LikePostRequestDto } from 'src/dtos/like-post.dto';
+import { DashboardItemDto } from 'src/dtos/dashboard.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -73,7 +75,7 @@ export class BoardsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '상세페이지 정보 전달' })
-  @ApiBody({ schema: {example: {id: '1'}, description: '조회할 경매 게시글 Id (PK)'}})
+  @ApiBody({ schema: {example: {id: '1'}, description: '조회할 경매 게시글 Id'}})
   @ApiResponse({ status: 200, type: DetailResponseDto })
   async detailPage(@Body() body: {id: string}, @Req() req){
     const { id } = body;
@@ -92,14 +94,18 @@ export class BoardsController {
 
   // 좋아요 업데이트
   @Post('/likepost')
-  async postLike(@Body() body: {id: number, userId: string}){
+  @ApiOperation({ summary: '좋아요 등록/취소' })
+  @ApiResponse({ status: 200, schema: {example: {message: '좋아요 등록 완료', status: true }}})
+  async postLike(@Body() body: LikePostRequestDto){
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
 
   // 대시보드 정보 전달
   @Get('/getInfo')
-  async getInfos(@Query() query){
-    return await this.boardService.dashInfo(query);
+  @ApiOperation({ summary: '대시보드 정보 조회' })
+  @ApiResponse({ status: 200, type: DashboardItemDto, isArray: true })
+  async getInfos(){
+    return await this.boardService.dashInfo();
   }
 }
