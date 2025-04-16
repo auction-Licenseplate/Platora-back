@@ -118,7 +118,7 @@ export class AuthController {
     // 쿠키에 저장
     res.cookie('accessToken', token.accessToken, {
       // httpOnly: true,
-      maxAge: 60 * 60 * 1000, // 1시간
+      maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
 
     res.cookie('refreshToken', token.refreshToken, {
@@ -203,6 +203,9 @@ export class AuthController {
   // 관리자 역할 확인
   @Get('/getRole')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '사용자 역할 확인' })
+  @ApiResponse({ status: 200, schema: {example: {role : 'admin'}}})
   async userRole(@Req() req){
     const userId = req.user.id;
     return this.authService.getUserRole(userId);

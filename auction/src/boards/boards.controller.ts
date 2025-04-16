@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards} from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
@@ -35,6 +35,13 @@ export class BoardsController {
   async getNo(@Query() query, @Req() req) {
     const userId = req.user.id;
     return await this.boardService.getMyPots(userId, query);
+  }
+
+  // 승인 전 게시글 삭제
+  @Delete('/deletePosts/:postId')
+  @UseGuards(JwtAuthGuard)
+  async postdel(@Param('postId') postId: string ){
+    return this.boardService.delPendingPost(postId);
   }
 
   // 승인 후

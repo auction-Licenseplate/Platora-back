@@ -74,6 +74,23 @@ export class BoardsService {
     return result;
   }
 
+  // 승인 전 게시글 삭제
+  async delPendingPost(postId: string){
+    const post = await this.adminRepository
+      .createQueryBuilder('admin')
+      .leftJoin('admin.vehicle', 'vehicle')
+      .where('vehicle.title = :postId', { postId })
+      .andWhere('admin.write_status = :status', {status: 'waiting'})
+      .getOne();
+    
+    if(!post){
+      return {message: '해당 게시글 없음'}
+    }
+
+    await this.adminRepository.remove(post);
+    return {message: '승인 전 게시글 삭제 완료'};
+  }
+
   // 승인 후 제공
   async getPosts(userId: string, query: any) {
     const statusArray = query.status ?? query['status[]'] ?? []; // status[] 고려

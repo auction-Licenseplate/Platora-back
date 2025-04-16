@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SendFailEmailDto } from 'src/dtos/send-fail-email.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { AlertResponseDto } from 'src/dtos/alert-res.dto';
 
 @Controller('notification')
 export class NotificationController {
@@ -19,6 +20,9 @@ export class NotificationController {
     // 알림 전체 정보 전달
     @Get('/getAlert')
     @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: '알림 정보 전체 전달'})
+    @ApiBearerAuth('accessToken')
+    @ApiResponse({ status: 200, type: AlertResponseDto, isArray: true })
     async sendAlert(@Req() req){
         const userId = req.user.id;
         return this.notificationService.sendAlertData(userId);
@@ -26,7 +30,9 @@ export class NotificationController {
 
     // 읽음 처리 변경
     @Patch('/:id')
+    @ApiOperation({ summary: '알림확인 처리 변경'})
+    @ApiResponse({ status: 200, description: '알림 변경 완료' })
     async alertCheck(@Param('id') id: number, @Body('check') check: boolean){
         return this.notificationService.alertChkUpdate(id, check);
-    } 
+    }
 }
