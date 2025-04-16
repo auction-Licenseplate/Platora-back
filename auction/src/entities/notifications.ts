@@ -9,10 +9,10 @@ export class Notifications {
     @ManyToOne(() => Users, (user) => user.id, { cascade: true, onDelete: "CASCADE" })
     user: Users;
 
-    @Column('varchar', {comment:'알림종류', length: 100, nullable: true})
+    @Column('varchar', {comment:'메일 종류', length: 100, nullable: true})
     type: string;
 
-    @Column('text', {comment:'알림 내용'})
+    @Column('text', {comment:'메일 내용'})
     message: string;
 
     @CreateDateColumn({ type: 'timestamp' }) 
