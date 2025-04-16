@@ -32,7 +32,7 @@ export class PayService {
             account,
             card_company: cardCompany,
             refund_amount: refundPoint,
-            refund_status: 'success',
+            refund_status: 'waiting',
         });
 
         // 환불 처리 후 유저테이블 포인트 업데이트

@@ -23,7 +23,7 @@ export class PayController {
                 account: '110-1234-5678',
                 card_company: '신한카드',
                 refund_amount: 5000,
-                refund_status: 'success',
+                refund_status: 'waiting',
             },
             remainPoint: 2000,
         }}

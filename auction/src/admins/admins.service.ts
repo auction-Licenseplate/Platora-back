@@ -66,7 +66,7 @@ export class AdminsService {
         'p.refund_amount AS refundAmount',
       ])
       .innerJoin('p.user', 'u')
-      .where('p.refund_status = :status', { status: 'success' })
+      .where('p.refund_status = :status', { status: 'waiting' })
       .getRawMany();
 
     const formattedData = rawData.map((data) => ({
@@ -89,6 +89,7 @@ export class AdminsService {
         user: {id: userId},
         refund_status: 'waiting',
       },
+      order: { id: 'DESC' },
     });
 
     if(!payment){
