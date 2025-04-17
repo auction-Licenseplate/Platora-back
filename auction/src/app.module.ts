@@ -26,6 +26,7 @@ import { Notifications } from './entities/notifications';
 import { Bids } from './entities/bids';
 import { Banners } from './entities/banners';
 import { Alerts } from './entities/alert';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -67,6 +68,8 @@ import { Alerts } from './entities/alert';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+
+    ScheduleModule.forRoot(), // 스케줄러
 
     UsersModule,
     AuthModule,

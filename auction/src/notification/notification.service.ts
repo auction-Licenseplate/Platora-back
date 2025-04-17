@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notifications } from 'src/entities/notifications';
 import { Users } from 'src/entities/users.entity';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { Vehicles } from 'src/entities/vehicles';
 import { Admins } from 'src/entities/admins';
 import * as path from 'path';
 import { Alerts } from 'src/entities/alert';
+import { Cron } from '@nestjs/schedule';
+import { Auctions } from 'src/entities/auctions';
+import { Bids } from 'src/entities/bids';
 
 @Injectable()
 export class NotificationService {
@@ -22,6 +25,10 @@ export class NotificationService {
         private adminRepository: Repository<Admins>,
         @InjectRepository(Alerts)
         private alertRepository: Repository<Alerts>,
+        @InjectRepository(Auctions)
+        private acutionRepository: Repository<Auctions>,
+        @InjectRepository(Bids)
+        private bidRepository: Repository<Bids>
     ) {}
 
     private transporter = nodemailer.createTransport({
@@ -238,5 +245,39 @@ export class NotificationService {
         await this.alertRepository.save(alert);
 
         return { message: '알림 변경 완료'};
+    }
+
+    // 경매종료 스케줄러 확인
+    @Cron('*/1 * * * *') // 1분마다 실행
+    async auctionEnd(){
+        const now = new Date();
+        
+        const expireAuc = await this.acutionRepository.find({
+            where: {
+                end_time: LessThanOrEqual(now),
+                status: 'before' // 아놔 진행중으로 상태 수정해놓을걸......
+            },
+            relations: ['bids', 'vehicle']
+        });
+
+        for (const auction of expireAuc) {
+            const lastBid = await this.bidRepository.findOne({
+                where: {auction: {id: auction.id}},
+                relations: ['user'],
+                order: {create_at: 'DESC'}
+            });
+
+            if (lastBid){
+                const alert = this.alertRepository.create({
+                    user: lastBid.user,
+                    vehicle: auction.vehicle,
+                    message: 'auc-end'
+                });
+                await this.alertRepository.save(alert);
+            }
+        
+            auction.status = 'completed'; // 상태변경
+            await this.acutionRepository.save(auction);
+        }
     }
 }
