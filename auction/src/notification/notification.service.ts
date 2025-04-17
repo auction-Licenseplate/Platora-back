@@ -230,6 +230,7 @@ export class NotificationService {
             message: x.message,
             check: x.check,
             created_at: x.created_at,
+            vehicleId: x.vehicle ? x.vehicle.id : null,
             vehicleTitle: x.vehicle ? x.vehicle.title : null,
         }));
     }
