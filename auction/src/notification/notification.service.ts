@@ -9,7 +9,6 @@ import { Admins } from 'src/entities/admins';
 import * as path from 'path';
 import { Alerts } from 'src/entities/alert';
 import { Cron } from '@nestjs/schedule';
-import * as crypto from 'crypto';
 import { Auctions } from 'src/entities/auctions';
 import { Bids } from 'src/entities/bids';
 
