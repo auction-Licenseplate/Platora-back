@@ -24,7 +24,8 @@ async function bootstrap() {
     next();
   });
   
-  // app.enableCors(false); 이거 안먹힘
+  app.enableCors(false);
+  
   // app.enableCors({
   //   origin: ['http://13.125.95.215', 'http://52.62.79.236'], // 여러 도메인 허용
   //   credentials: true, // 쿠키 전송 허용
