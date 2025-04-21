@@ -37,6 +37,7 @@ export class AuthController {
     schema:{ example: {message: '로그인 성공', id: 1, email: 'user@example.com', token: '발급받은 jwt token'}} 
   })
   async login(@Req() req: any, @Res() res: any) {
+    console.log("📦 로그인 응답 status: 200, user:", req.user);
     const { id, email, token } = req.user;
     if (!token) {
       return { message: '로그인 실패' };
