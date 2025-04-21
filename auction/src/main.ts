@@ -7,9 +7,14 @@ import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ExpressAdapter } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
+  const server = express();
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+    cors: false,
+  });
 
   app.use(cookieParser());
   app.use('/static', express.static(join(__dirname, '..', 'public')));
