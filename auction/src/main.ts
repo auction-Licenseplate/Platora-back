@@ -7,34 +7,29 @@ import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ExpressAdapter } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule);
-  const server = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
-    cors: false,
-  });
+  const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
   app.use('/static', express.static(join(__dirname, '..', 'public')));
 
-  console.log('CORS 비활성화 상태 - nginx에서 처리함');
-
-  app.use((req, res, next) => { // nginx에서 cors 설정
-    res.removeHeader('Access-Control-Allow-Credentials');
-    res.removeHeader('Access-Control-Allow-Origin');
-    res.removeHeader('Access-Control-Allow-Methods');
-    res.removeHeader('Access-Control-Allow-Headers');
-    next();
+  app.enableCors({
+    origin: ['http://13.125.95.215', 'http://52.62.79.236'],
+    credentials: true, // 쿠키 전송 허용
+    methods: 'GET,POST,OPTIONS,PUT,PATCH,DELETE',
+    allowedHeaders: 'Origin,Content-Type,Accept,Authorization',
   });
-  
-  app.enableCors(false);
-  
-  // app.enableCors({
-  //   origin: ['http://13.125.95.215', 'http://52.62.79.236'], // 여러 도메인 허용
-  //   credentials: true, // 쿠키 전송 허용
+
+  // app.use((req, res, next) => { // nginx에서 cors 설정
+  //   res.removeHeader('Access-Control-Allow-Credentials');
+  //   res.removeHeader('Access-Control-Allow-Origin');
+  //   res.removeHeader('Access-Control-Allow-Methods');
+  //   res.removeHeader('Access-Control-Allow-Headers');
+  //   next();
   // });
+  // app.enableCors(false);
+
 
   const options = new DocumentBuilder()
     .setTitle('Platora API 문서')
