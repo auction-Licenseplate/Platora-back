@@ -14,7 +14,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use('/static', express.static(join(__dirname, '..', 'public')));
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:4000'], // 여러 도메인 허용
+    origin: ['http://13.125.95.215', 'http://52.62.79.236'], // 여러 도메인 허용
     credentials: true, // 쿠키 전송 허용
   });
 
