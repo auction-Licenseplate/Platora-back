@@ -45,7 +45,7 @@ export class AuthController {
       // httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
-    return res.json({ message: '로그인 성공', id, email, token });
+    return res.status(200).json({ message: '로그인 성공', id, email, token });
   }
 
   // 쿠키에서 토큰 꺼내기
