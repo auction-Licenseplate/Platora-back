@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -28,6 +28,7 @@ export class AuthController {
   }
 
   // 로컬 로그인 API
+  @HttpCode(200)
   @Post('/login')
   @UseGuards(AuthGuard('local'))
   @ApiOperation({ summary: '로컬 로그인' })
