@@ -47,7 +47,7 @@ export class AuthService {
     // 비밀번호 검증 (느낌표는 null일 가능성이 있는 것처럼 보이더라도 실제로 null이 아니라는 것을 알려줌)
     const match = await bcrypt.compare(password, user.password!);
     if (!match) {
-      return { message: '200 비밀번호 불일치함' };
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
     // 토큰 발급
