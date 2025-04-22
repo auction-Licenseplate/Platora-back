@@ -24,7 +24,7 @@ async function bootstrap() {
       }
     },
     credentials: true, // 쿠키 전송 허용
-    methods: 'GET,POST,OPTIONS,PUT,PATCH,DELETE', // 리소스 접근을 허용하는 HTTP 메서드를 지정해 주는 헤더
+    methods: 'GET,POST,OPTIONS,PUT,PATCH,DELETE,preflight', // 리소스 접근을 허용하는 HTTP 메서드를 지정해 주는 헤더
     allowedHeaders: 'Origin,Content-Type,Accept,Authorization', // 요청을 허용하는 헤더
   });
 
