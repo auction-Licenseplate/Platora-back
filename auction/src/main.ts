@@ -18,7 +18,7 @@ async function bootstrap() {
     origin: (origin, callback) => { // 접근가능 주소
       const allowedOrigins = ['http://13.125.95.215', 'http://52.62.79.236'];
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+        callback(null, origin);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
