@@ -15,10 +15,17 @@ async function bootstrap() {
   app.use('/static', express.static(join(__dirname, '..', 'public')));
 
   app.enableCors({
-    origin: ['http://13.125.95.215', 'http://52.62.79.236'],
+    origin: (origin, callback) => { // 접근가능 주소
+      const allowedOrigins = ['http://13.125.95.215', 'http://52.62.79.236'];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true, // 쿠키 전송 허용
-    methods: 'GET,POST,OPTIONS,PUT,PATCH,DELETE',
-    allowedHeaders: 'Origin,Content-Type,Accept,Authorization',
+    methods: 'GET,POST,OPTIONS,PUT,PATCH,DELETE', // 리소스 접근을 허용하는 HTTP 메서드를 지정해 주는 헤더
+    allowedHeaders: 'Origin,Content-Type,Accept,Authorization', // 요청을 허용하는 헤더
   });
 
   // app.use((req, res, next) => { // nginx에서 cors 설정
