@@ -25,6 +25,7 @@ export class UsersController {
     @ApiOperation({ summary: '사용자 마이페이지 정보 조회' })
     @ApiResponse({ status: 200, type: UserInfoResponseDto })
     async userInfo(@Req() req: AuthRequest) {
+        console.log('사용자정보나타나라제발')
         console.log(req.user, '사용자확인-컨트롤러');
         const user = req.user;
         return await this.userService.getUserInfo(user.id);
