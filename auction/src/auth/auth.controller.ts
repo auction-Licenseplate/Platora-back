@@ -2,7 +2,8 @@ import { Body, Controller, Get, HttpCode, Param, Post, Req, Res, UseGuards } fro
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+// import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { JwtAuthGuard } from './jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { LocalLoginDto } from 'src/dtos/local-login.dto';
 import { SocialLoginDto } from 'src/dtos/social-login.dto';
@@ -45,6 +46,7 @@ export class AuthController {
     
     res.cookie('accessToken', token, { // 쿠키에 토큰 저장
       // httpOnly: true,
+      domain: '13.125.95.215',
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
     return res.status(200).json({ message: '로그인 성공', id, email, token });
@@ -120,11 +122,13 @@ export class AuthController {
     // 쿠키에 저장
     res.cookie('accessToken', token.accessToken, {
       // httpOnly: true,
+      domain: '13.125.95.215',
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
 
     res.cookie('refreshToken', token.refreshToken, {
       // httpOnly: true,
+      domain: '13.125.95.215',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
