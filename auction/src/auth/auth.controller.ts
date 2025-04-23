@@ -46,7 +46,9 @@ export class AuthController {
     
     res.cookie('accessToken', token, { // 쿠키에 토큰 저장
       // httpOnly: true,
-      domain: '13.125.95.215',
+      secure: false, // HTTP 환경에선 false
+      sameSite: 'lax', 
+      // domain: '13.125.95.215',
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
     return res.status(200).json({ message: '로그인 성공', id, email, token });
@@ -122,13 +124,17 @@ export class AuthController {
     // 쿠키에 저장
     res.cookie('accessToken', token.accessToken, {
       // httpOnly: true,
-      domain: '13.125.95.215',
+      secure: false, // HTTP 환경에선 false
+      sameSite: 'lax', 
+      // domain: '13.125.95.215',
       maxAge: 1000 * 60 * 60 * 24, // 1일 유지
     });
 
     res.cookie('refreshToken', token.refreshToken, {
       // httpOnly: true,
-      domain: '13.125.95.215',
+      secure: false, // HTTP 환경에선 false
+      sameSite: 'lax', 
+      // domain: '13.125.95.215',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
