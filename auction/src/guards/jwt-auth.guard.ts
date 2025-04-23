@@ -9,7 +9,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
     console.log('📌 JWT Token:', token); // 토큰 출력
-    
+
     try {
       return super.canActivate(context);
     } catch (err) {
