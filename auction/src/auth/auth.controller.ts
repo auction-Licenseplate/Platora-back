@@ -52,9 +52,6 @@ export class AuthController {
   // 쿠키에서 토큰 꺼내기
   // @Get('/tokenCheck')
   // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth('accessToken')
-  // @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
-  // @ApiResponse({ status: 200, schema:{ example: {message: '로그인 유지됨', token: '발급받은 jwt token'}}})
   // async tokenCheck(@Req() req: Request) {
   //   // console.log("req.user 정보:", req.user);
   //   if (!req.cookies || !req.cookies.accessToken) {
