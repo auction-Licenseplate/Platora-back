@@ -235,7 +235,8 @@ export class AdminsService {
         vehicle,
         grade,
         auction_num: rnadomAuction,
-        start_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3일 후
+        // start_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3일 후
+        start_time: new Date(Date.now()), // 바로 지금
         end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 8), // 8일 후
         status: 'before',
         final_price: grade?.min_price
