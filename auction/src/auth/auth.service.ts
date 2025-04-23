@@ -38,22 +38,17 @@ export class AuthService {
 
   // 일반 로그인
   async localLogin(email: string, password: string) {
-    console.log(email, password, '1')
     // 유저 정보 확인
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
-      console.log('유저확인에러')
       throw new UnauthorizedException('200 유저 정보 없음.');
     }
-    console.log(user, '2')
 
     // 비밀번호 검증 (느낌표는 null일 가능성이 있는 것처럼 보이더라도 실제로 null이 아니라는 것을 알려줌)
     const match = await bcrypt.compare(password, user.password!);
     if (!match) {
-      console.log('매치검증에러')
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
-    console.log(match, '3')
 
     // 토큰 발급
     const payload = { id: user.id, email: user.email };
@@ -62,8 +57,7 @@ export class AuthService {
       secret: secretKey,
       expiresIn: '1d',
     });
-    console.log(newToken, '4');
-    // console.log("새로 발급된 토큰:", newToken);
+    console.log("발급된 토큰:", newToken);
     return { id: user.id, email: user.email, token: newToken };
   }
 

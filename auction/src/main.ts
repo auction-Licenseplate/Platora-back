@@ -16,7 +16,6 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => { // 접근가능 주소
-      console.log('변경되나?????????????????????????');
       const allowedOrigins = ['http://13.125.95.215', 'http://52.62.79.236'];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, origin);
@@ -37,7 +36,6 @@ async function bootstrap() {
   //   next();
   // });
   // app.enableCors(false);
-
 
   const options = new DocumentBuilder()
     .setTitle('Platora API 문서')
