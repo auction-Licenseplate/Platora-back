@@ -202,6 +202,8 @@ export class AuthController {
   @ApiOperation({ summary: '사용자 역할 확인' })
   @ApiResponse({ status: 200, schema: {example: {role : 'admin'}}})
   async userRole(@Req() req){
+    console.log('관리자나타나라제발')
+    console.log(req.user, '사용자확인-컨트롤러22');
     const userId = req.user.id;
     return this.authService.getUserRole(userId);
   }
