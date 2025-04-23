@@ -4,6 +4,12 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest();
+    const authHeader = request.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+    console.log('📌 JWT Token:', token); // 토큰 출력
+    
     try {
       return super.canActivate(context);
     } catch (err) {
