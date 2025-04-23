@@ -215,6 +215,8 @@ export class BoardsService {
       .andWhere('fav.status = true')
       .getOne();
   
+    console.log(favorite, '좋아요')
+
     return {
       data: result,
       isFavorite: favorite ? true : false,
