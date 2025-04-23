@@ -220,7 +220,7 @@ export class NotificationService {
     async sendAlertData(userId: number){
         const alerts = await this.alertRepository.find({
             where: {user: {id: userId}},
-            relations: ['vehicle'],
+            relations: ['vehicle', 'auction'],
             order: { created_at: 'DESC'},
         });
 
@@ -230,6 +230,7 @@ export class NotificationService {
             message: x.message,
             check: x.check,
             created_at: x.created_at,
+            auctionId: x.auction ? x.auction.id : null,
             vehicleId: x.vehicle ? x.vehicle.id : null,
             vehicleTitle: x.vehicle ? x.vehicle.title : null,
         }));

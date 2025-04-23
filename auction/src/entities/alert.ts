@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Users } from "./users.entity";
 import { Vehicles } from "./vehicles";
+import { Auctions } from "./auctions";
 
 @Entity('alerts')
 export class Alerts {
@@ -12,6 +13,9 @@ export class Alerts {
 
     @ManyToOne(() => Vehicles, (vehicle) => vehicle.id, {cascade: true, onDelete: 'CASCADE'})
     vehicle: Vehicles;
+
+    @ManyToOne(() => Auctions, (auction) => auction.id, {cascade: true, onDelete: 'CASCADE'})
+    auction: Auctions;
 
     @Column('text', {comment:'알림 내용'})
     message: string;

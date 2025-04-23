@@ -1,8 +1,7 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-// import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { JwtAuthGuard } from './jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { LocalLoginDto } from 'src/dtos/local-login.dto';
@@ -202,8 +201,6 @@ export class AuthController {
   @ApiOperation({ summary: '사용자 역할 확인' })
   @ApiResponse({ status: 200, schema: {example: {role : 'admin'}}})
   async userRole(@Req() req){
-    console.log('관리자나타나라제발')
-    console.log(req.user, '사용자확인-컨트롤러22');
     const userId = req.user.id;
     return this.authService.getUserRole(userId);
   }
