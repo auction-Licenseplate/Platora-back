@@ -29,45 +29,39 @@ export class AuthController {
   }
 
   // 로컬 로그인 API
-  @HttpCode(200)
   @Post('/login')
   @UseGuards(AuthGuard('local'))
   @ApiOperation({ summary: '로컬 로그인' })
   @ApiBody({ type: LocalLoginDto})
-  @ApiResponse({ status: 200,
-    schema:{ example: {message: '로그인 성공', id: 1, email: 'user@example.com', token: '발급받은 jwt token'}} 
-  })
+  @ApiResponse({ status: 200, schema:{ example: {message: '로그인 성공', id: 1, email: 'user@example.com', token: '발급받은 jwt token'}}})
   async login(@Req() req: any, @Res() res: any) {
     console.log("📦 로그인 응답 status: 200, user:", req.user);
     const { id, email, token } = req.user;
     if (!token) {
       return { message: '로그인 실패' };
     }
-    
-    res.cookie('accessToken', token, { // 쿠키에 토큰 저장
-      // httpOnly: true,
-      secure: false, // HTTP 환경에선 false
-      sameSite: 'lax', 
-      // domain: '13.125.95.215',
-      maxAge: 1000 * 60 * 60 * 24, // 1일 유지
-      path: '/',
-    });
+    // res.cookie('accessToken', token, { // 쿠키에 토큰 저장
+    //   // httpOnly: true,
+    //   secure: false, // HTTP 환경에선 false
+    //   sameSite: 'lax', 
+    //   maxAge: 1000 * 60 * 60 * 24, // 1일 유지
+    // });
     return res.status(200).json({ message: '로그인 성공', id, email, token });
   }
 
   // 쿠키에서 토큰 꺼내기
-  @Get('/tokenCheck')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
-  @ApiResponse({ status: 200, schema:{ example: {message: '로그인 유지됨', token: '발급받은 jwt token'}}})
-  async tokenCheck(@Req() req: Request) {
-    // console.log("req.user 정보:", req.user);
-    if (!req.cookies || !req.cookies.accessToken) {
-      return { isAuthenticated: false, message: '토큰 없음' };
-    }
-    return { message: '로그인 유지됨', token: req.user };
-  }
+  // @Get('/tokenCheck')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth('accessToken')
+  // @ApiOperation({ summary: 'JWT 토큰 확인 (쿠키에서 accessToken 확인)' })
+  // @ApiResponse({ status: 200, schema:{ example: {message: '로그인 유지됨', token: '발급받은 jwt token'}}})
+  // async tokenCheck(@Req() req: Request) {
+  //   // console.log("req.user 정보:", req.user);
+  //   if (!req.cookies || !req.cookies.accessToken) {
+  //     return { isAuthenticated: false, message: '토큰 없음' };
+  //   }
+  //   return { message: '로그인 유지됨', token: req.user };
+  // }
 
   // 카카오 로그인 API
   @Get('/kakao')
@@ -89,10 +83,7 @@ export class AuthController {
 
   // sns 로그인 타입 구별
   @Post('login/:type')
-  @ApiOperation({
-    summary: 'SNS 로그인 완료 (토큰 발급)',
-    description: 'SNS 로그인 API 사용'
-  })
+  @ApiOperation({ summary: 'SNS 로그인 완료 (토큰 발급)', description: 'SNS 로그인 API 사용' })
   @ApiParam({ name: 'type', enum: ['kakao', 'naver', 'google'], description: 'SNS 플랫폼 종류' })
   @ApiResponse({status: 200, 
     schema: {example: {
@@ -100,13 +91,7 @@ export class AuthController {
       token: {accessToken: 'jwt.access.token...', refreshToken: 'jwt.refresh.token...',}
     }}
   })
-  async socialLogin(
-    @Param('type') type: string,
-    @Res() res: Response,
-    @Body() body: SocialLoginDto,
-  ) {
-    // console.log(`프론트에서 받은타입 ${type}`);
-    // console.log(`프론트에서 받은코드 ${body.code}`);
+  async socialLogin(@Param('type') type: string, @Res() res: Response, @Body() body: SocialLoginDto) {
     let user;
 
     if (type === 'kakao') {
@@ -123,23 +108,21 @@ export class AuthController {
     const token = await this.authService.snsToken(user);
 
     // 쿠키에 저장
-    res.cookie('accessToken', token.accessToken, {
-      // httpOnly: true,
-      secure: false, // HTTP 환경에선 false
-      sameSite: 'lax', 
-      path: '/',
-      // domain: '13.125.95.215',
-      maxAge: 1000 * 60 * 60 * 24, // 1일 유지
-    });
+    // res.cookie('accessToken', token.accessToken, {
+    //   // httpOnly: true,
+    //   secure: false, // HTTP 환경에선 false
+    //   sameSite: 'lax', 
+    //   path: '/',
+    //   maxAge: 1000 * 60 * 60 * 24, // 1일 유지
+    // });
 
-    res.cookie('refreshToken', token.refreshToken, {
-      // httpOnly: true,
-      secure: false, // HTTP 환경에선 false
-      sameSite: 'lax', 
-      path: '/',
-      // domain: '13.125.95.215',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
-    });
+    // res.cookie('refreshToken', token.refreshToken, {
+    //   // httpOnly: true,
+    //   secure: false, // HTTP 환경에선 false
+    //   sameSite: 'lax', 
+    //   path: '/',
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+    // });
 
     return res.json({ user, token });
   }
