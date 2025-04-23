@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+// import { JwtAuthGuard } from './jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { LocalLoginDto } from 'src/dtos/local-login.dto';
 import { SocialLoginDto } from 'src/dtos/social-login.dto';
