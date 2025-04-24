@@ -78,7 +78,6 @@ export class AdminsService {
       amount: data.refundAmount || 0,
     }));
 
-    // console.log('가공된 데이터:', formattedData); // 가공된 데이터 확인
     return formattedData;
   }
 
@@ -288,7 +287,6 @@ export class AdminsService {
     );
 
     if (approvedVehicle) {
-      // console.log('차량상태', approvedVehicle.ownership_status);
       return approvedVehicle.ownership_status;
     }
 

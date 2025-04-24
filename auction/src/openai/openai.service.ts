@@ -15,7 +15,6 @@ export class OpenaiService {
       ) {
         this.ZEMINAR_API_KEY =
           this.configService.get<string>('ZEMINAR_API_KEY') ?? '';
-        console.log('ZEMINAR_API_KEY:', this.ZEMINAR_API_KEY); // 환경 변수 확인 로그
       }
 
 

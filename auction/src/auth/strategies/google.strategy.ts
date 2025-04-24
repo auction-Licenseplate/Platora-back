@@ -15,7 +15,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google'){
     }
 
     async validate(accessToken: string, refreshToken: string, profile: Profile, done: (error: any, user?: any, info?: any) => void){
-        console.log("Google profile이란:", profile);
         try{
             if (!profile.emails || profile.emails.length === 0) {
                 return done(new Error("이메일 정보 없음"), null);

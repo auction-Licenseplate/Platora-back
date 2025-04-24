@@ -64,7 +64,6 @@ export class UsersService {
 
   // 공인인증서 db 저장
   async saveFile(userId: number, body: any, file: Express.Multer.File) {
-    console.log(body.grade, body.score, body.price);
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       return { message: '유저정보 없음' };

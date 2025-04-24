@@ -57,14 +57,11 @@ export class AuthService {
       secret: secretKey,
       expiresIn: '1d',
     });
-    console.log("발급된 토큰:", newToken);
     return { id: user.id, email: user.email, token: newToken };
   }
 
   // 카카오 로그인
   async kakaoUser(code: string) {
-    console.log('카카오 로그인 받은 코드:', code);
-
     const KAKAO_TOKEN_URL = 'https://kauth.kakao.com/oauth/token';
     const KAKAO_USER_INFO_URL = 'https://kapi.kakao.com/v2/user/me';
 
@@ -115,15 +112,12 @@ export class AuthService {
       await this.userRepository.save(user);
       return user.id;
     }
-    console.log('카카오 사용자 정보:', userResponse?.data);
 
     return user;
   }
 
   // 네이버 로그인
   async naverUser(code: string) {
-    console.log('네이버 로그인 받은 코드:', code);
-
     const NAVER_TOKEN_URL = 'https://nid.naver.com/oauth2.0/token';
     const NAVER_USER_INFO_URL = 'https://openapi.naver.com/v1/nid/me';
 
@@ -157,7 +151,6 @@ export class AuthService {
       });
 
     const naverAccount = userResponse?.data.response;
-    console.log('네이버 사용자 정보:', naverAccount);
 
     let user = await this.userRepository.findOne({
       where: { email: naverAccount.email },
@@ -179,8 +172,6 @@ export class AuthService {
 
   // 구글 로그인
   async googleUser(code: string) {
-    console.log('구글 로그인 요청, 받은 코드:', code);
-
     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USER_INFO_URL =
       'https://www.googleapis.com/oauth2/v2/userinfo';
@@ -215,7 +206,6 @@ export class AuthService {
       });
 
     const googleAccount = userResponse?.data;
-    console.log('구글 사용자 정보:', googleAccount);
 
     let user = await this.userRepository.findOne({
       where: { email: googleAccount.email },

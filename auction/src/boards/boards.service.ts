@@ -216,11 +216,6 @@ export class BoardsService {
       .andWhere('fav.user = :userId', { userId: Number(userId) })
       .andWhere('fav.status = true')
       .getOne();
-  
-    // console.log(typeof auctionId, auctionId, '경매아이디타입'); 
-    // console.log(typeof userId, userId, '유저아이디타입');    
-    console.log('auctionId:', auctionId, typeof auctionId);
-    console.log(favorite, '좋아요')
 
     return {
       data: result,
@@ -324,12 +319,9 @@ export class BoardsService {
         auction: { id: numAuctionId },
       },
     });
-      console.log('경매타입변경확인', typeof id);
-      console.log('찾은 favorite:', existingFavorite);
 
     if (existingFavorite) { // 토글 진행
       existingFavorite.status = !existingFavorite.status;
-      console.log(existingFavorite.status, '토글변환하트')
       await this.favoriteRepository.save(existingFavorite);
       return { 
         message: existingFavorite.status ? '좋아요 등록 완료' : '좋아요 취소 완료',
