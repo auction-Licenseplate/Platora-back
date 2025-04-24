@@ -305,7 +305,9 @@ export class BoardsService {
   }
 
   // 좋아요 업데이트
-  async updateLike(id: string, userId: string, currentUser: string){
+  async updateLike(id: string, userId: string, currentUser: Number){
+    console.log(typeof currentUser,'============', currentUser)
+
     const numUserId = Number(userId); // 타입 맞춰서 진행해야함
     const numAuctionId = Number(id);
     const numCurrentUserId = Number(currentUser);
