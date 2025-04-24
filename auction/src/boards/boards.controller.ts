@@ -109,6 +109,7 @@ export class BoardsController {
     console.log('like 요청 body:', body);
     const currentUser = req.user;
     const { id, userId } = body;
+    console.log(typeof currentUser)
     return await this.boardService.updateLike(id, userId, currentUser);
   }
 
