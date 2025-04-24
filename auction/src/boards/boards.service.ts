@@ -305,11 +305,12 @@ export class BoardsService {
   }
 
   // 좋아요 업데이트
-  async updateLike(auctionId: number, userId: string){
+  async updateLike(auctionId: string, userId: string){
     const numUserId = Number(userId); // 타입 맞춰서 진행해야함
+    const numAuctionId = Number(auctionId);
 
     const user = await this.userRepository.findOne({ where: { id: numUserId } });
-    const auction = await this.auctionRepository.findOne({ where: { id: auctionId } });
+    const auction = await this.auctionRepository.findOne({ where: { id: numAuctionId } });
 
     if (!user || !auction) {
       return { message: '유저랑 경매 정보 없음' };
@@ -327,7 +328,7 @@ export class BoardsService {
       .leftJoinAndSelect('fav.user', 'user')
       .leftJoinAndSelect('fav.auction', 'auction')
       .where('user.id = :userId', { userId: numUserId })
-      .andWhere('auction.id = :auctionId', { auctionId })
+      .andWhere('auction.id = :auctionId', { auctionId: numAuctionId })
       .getOne();
 
       console.log('유저아이디', user.id);
@@ -341,12 +342,12 @@ export class BoardsService {
       return { 
         message: existingFavorite.status ? '좋아요 등록 완료' : '좋아요 취소 완료',
         status: existingFavorite.status,
-       };
+      };
     }
 
     const favorite = this.favoriteRepository.create({
-      user: { id: user.id },
-      auction: { id: auction.id },
+      user: { id: numUserId },
+      auction: { id: numAuctionId },
       status: true,
     });
     await this.favoriteRepository.save(favorite);
