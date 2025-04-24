@@ -308,9 +308,11 @@ export class BoardsService {
   async updateLike(auctionId: string, userId: string){
     const numUserId = Number(userId); // 타입 맞춰서 진행해야함
     const numAuctionId = Number(auctionId);
+    console.log(numAuctionId, '서비스에서 타입변환한 경매번호')
 
     const user = await this.userRepository.findOne({ where: { id: numUserId } });
     const auction = await this.auctionRepository.findOne({ where: { id: numAuctionId } });
+    console.log(auction, '서비스코드 - 일치하는 경매')
 
     if (!user || !auction) {
       return { message: '유저랑 경매 정보 없음' };
@@ -331,9 +333,7 @@ export class BoardsService {
       .andWhere('auction.id = :auctionId', { auctionId: numAuctionId })
       .getOne();
 
-      console.log('유저아이디', user.id);
-      console.log('경매게시판', auction.id);
-      console.log('auctionId:', auctionId, typeof auctionId);
+      console.log('경매타입변경확인', typeof auctionId);
       console.log('찾은 favorite:', existingFavorite);
 
     if (existingFavorite) { // 토글 진행
