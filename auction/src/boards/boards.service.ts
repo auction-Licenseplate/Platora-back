@@ -321,20 +321,20 @@ export class BoardsService {
       return { message: '유저랑 경매 정보 없음' };
     }
 
-    // const existingFavorite = await this.favoriteRepository.findOne({
-    //   where: {
-    //     user: { id: numUserId },
-    //     auction: { id: auctionId },
-    //   },
-    // });
+    const existingFavorite = await this.favoriteRepository.findOne({
+      where: {
+        user: { id: numUserId },
+        auction: { id: numAuctionId },
+      },
+    });
 
-    const existingFavorite = await this.favoriteRepository
-      .createQueryBuilder('fav')
-      .leftJoinAndSelect('fav.user', 'user')
-      .leftJoinAndSelect('fav.auction', 'auction')
-      .where('user.id = :userId', { userId: numUserId })
-      .andWhere('auction.id = :auctionId', { auctionId: numAuctionId })
-      .getOne();
+    // const existingFavorite = await this.favoriteRepository
+    //   .createQueryBuilder('fav')
+    //   .leftJoinAndSelect('fav.user', 'user')
+    //   .leftJoinAndSelect('fav.auction', 'auction')
+    //   .where('user.id = :userId', { userId: numUserId })
+    //   .andWhere('auction.id = :auctionId', { auctionId: numAuctionId })
+    //   .getOne();
 
       console.log('경매타입변경확인', typeof id);
       console.log('찾은 favorite:', existingFavorite);

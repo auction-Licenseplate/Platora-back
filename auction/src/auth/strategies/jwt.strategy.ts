@@ -23,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       where: { id: payload.id },
     });
     if (!user) {
-      console.log('유저 정보 없음');
       throw new UnauthorizedException('유효하지 않은 토큰임');
     }
     return user;
