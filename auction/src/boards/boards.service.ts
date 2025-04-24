@@ -329,6 +329,10 @@ export class BoardsService {
       .andWhere('auction.id = :auctionId', { auctionId })
       .getOne();
 
+      console.log('유저아이디', user.id);
+      console.log('경매게시판', auction.id);
+      console.log('찾은 favorite:', existingFavorite);
+
     if (existingFavorite) { // 토글 진행
       existingFavorite.status = !existingFavorite.status;
       await this.favoriteRepository.save(existingFavorite);
@@ -339,8 +343,8 @@ export class BoardsService {
     }
 
     const favorite = this.favoriteRepository.create({
-      user,
-      auction,
+      user: { id: user.id },
+      auction: { id: auction.id },
       status: true,
     });
     await this.favoriteRepository.save(favorite);
