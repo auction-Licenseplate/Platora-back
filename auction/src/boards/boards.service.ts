@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auctions } from 'src/entities/auctions';
 import { Favorites } from 'src/entities/favorites';
@@ -309,6 +309,9 @@ export class BoardsService {
     const numUserId = Number(userId); // 타입 맞춰서 진행해야함
     const numAuctionId = Number(id);
     console.log(numAuctionId, '서비스에서 타입변환한 경매번호')
+    if (isNaN(numAuctionId)) {
+      throw new BadRequestException('잘못된 요청: 숫자 변환 실패');
+    }
 
     const user = await this.userRepository.findOne({ where: { id: numUserId } });
     const auction = await this.auctionRepository.findOne({ where: { id: numAuctionId } });

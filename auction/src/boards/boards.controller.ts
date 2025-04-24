@@ -106,6 +106,7 @@ export class BoardsController {
   @ApiResponse({ status: 200, schema: {example: {message: '좋아요 등록 완료', status: true }}})
   async postLike(@Body() body: LikePostRequestDto){
     console.log(body.id, '좋아요 업데이트 할 경매번호')
+    console.log('like 요청 body:', body);
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
