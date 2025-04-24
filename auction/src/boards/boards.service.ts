@@ -341,6 +341,7 @@ export class BoardsService {
 
     if (existingFavorite) { // 토글 진행
       existingFavorite.status = !existingFavorite.status;
+      console.log(existingFavorite.status, '토글변환하트')
       await this.favoriteRepository.save(existingFavorite);
       return { 
         message: existingFavorite.status ? '좋아요 등록 완료' : '좋아요 취소 완료',
