@@ -11,6 +11,7 @@ import { Vehicles } from './vehicles';
 import { Grades } from './grades';
 import { Admins } from './admins';
 import { Bids } from './bids';
+import { Favorites } from './favorites';
 
 @Entity('auctions')
 export class Auctions {
@@ -44,6 +45,9 @@ export class Auctions {
 
   @OneToMany(() => Bids, (bid) => bid.auction)
   bids: Bids[];
+
+  @OneToMany(() => Favorites, (favorite) => favorite.auction)
+  favorites: Favorites[];
 
   @Column({ type: 'timestamp' })
   start_time: Date;

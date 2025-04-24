@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Favorites } from './favorites';
 @Entity('users') // 테이블 이름
 export class Users {
   @PrimaryGeneratedColumn({type:'int', comment:'고유 사용자ID'})
@@ -27,6 +28,9 @@ export class Users {
 
   @Column('varchar', {comment:'관리자', length: 100, nullable: true, default: 'user'})
   role?: string;
+
+  @OneToMany(() => Favorites, (favorite) => favorite.user)
+  favorites: Favorites[];
 
   @CreateDateColumn({ type: 'timestamp' }) 
   created_at: Date;

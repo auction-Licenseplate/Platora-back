@@ -319,7 +319,6 @@ export class BoardsService {
     //     user: { id: numUserId },
     //     auction: { id: auctionId },
     //   },
-    //   relations: ['user', 'auction'],
     // });
 
     const existingFavorite = await this.favoriteRepository
