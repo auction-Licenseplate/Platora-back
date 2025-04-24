@@ -319,7 +319,7 @@ export class BoardsService {
         user: { id: numUserId },
         auction: { id: auctionId },
       },
-      relations: ['user', 'auction'],
+      // relations: ['user', 'auction'],
     });
 
     if (existingFavorite) { // 토글 진행
