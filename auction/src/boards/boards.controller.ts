@@ -85,6 +85,7 @@ export class BoardsController {
   @ApiBody({ schema: {example: {id: '1'}, description: '조회할 경매 게시글 Id'}})
   @ApiResponse({ status: 200, type: DetailResponseDto })
   async detailPage(@Body() body: {id: string}, @Req() req){
+    console.log(body, '경매번호뭔데?????????????????????????????????')
     const { id } = body;
     const userId = req.user.id
     return await this.boardService.getDetailInfo(id, userId);
@@ -104,6 +105,7 @@ export class BoardsController {
   @ApiOperation({ summary: '좋아요 등록/취소' })
   @ApiResponse({ status: 200, schema: {example: {message: '좋아요 등록 완료', status: true }}})
   async postLike(@Body() body: LikePostRequestDto){
+    console.log(body.id, '22경매번호뭔데?????????????????????????????????')
     const { id, userId } = body;
     return await this.boardService.updateLike(id, userId);
   }
