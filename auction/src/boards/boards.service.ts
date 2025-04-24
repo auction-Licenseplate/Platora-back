@@ -314,13 +314,21 @@ export class BoardsService {
       return { message: '유저랑 경매 정보 없음' };
     }
 
-    const existingFavorite = await this.favoriteRepository.findOne({
-      where: {
-        user: { id: numUserId },
-        auction: { id: auctionId },
-      },
-      // relations: ['user', 'auction'],
-    });
+    // const existingFavorite = await this.favoriteRepository.findOne({
+    //   where: {
+    //     user: { id: numUserId },
+    //     auction: { id: auctionId },
+    //   },
+    //   relations: ['user', 'auction'],
+    // });
+
+    const existingFavorite = await this.favoriteRepository
+      .createQueryBuilder('fav')
+      .leftJoin('fav.user', 'user')
+      .leftJoin('fav.auction', 'auction')
+      .where('user.id = :userId', { userId: numUserId })
+      .andWhere('auction.id = :auctionId', { auctionId })
+      .getOne();
 
     if (existingFavorite) { // 토글 진행
       existingFavorite.status = !existingFavorite.status;
