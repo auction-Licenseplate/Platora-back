@@ -218,6 +218,7 @@ export class BoardsService {
   
     // console.log(typeof auctionId, auctionId, '경매아이디타입'); 
     // console.log(typeof userId, userId, '유저아이디타입');    
+    console.log('auctionId:', auctionId, typeof auctionId);
     console.log(favorite, '좋아요')
 
     return {
@@ -331,6 +332,7 @@ export class BoardsService {
 
       console.log('유저아이디', user.id);
       console.log('경매게시판', auction.id);
+      console.log('auctionId:', auctionId, typeof auctionId);
       console.log('찾은 favorite:', existingFavorite);
 
     if (existingFavorite) { // 토글 진행
