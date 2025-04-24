@@ -186,6 +186,7 @@ export class BoardsService {
         'vehicle.car_info',
         'vehicle.car_img',
         'vehicle.plate_num', // 번호판
+        'bid.bid_price', // 입찰가격
         'bid.create_at',
         'bidUser.name',
         'grade.price_unit' // 입찰단위
@@ -210,11 +211,13 @@ export class BoardsService {
 
     const favorite = await this.favoriteRepository
       .createQueryBuilder('fav')
-      .where('fav.auction = :auctionId', { auctionId })
+      .where('fav.auction = :auctionId', { auctionId: Number(auctionId) })
       .andWhere('fav.user = :userId', { userId: Number(userId) })
       .andWhere('fav.status = true')
       .getOne();
   
+    console.log(typeof auctionId, auctionId, '경매아이디타입'); 
+    console.log(typeof userId, userId, '유저아이디타입');    
     console.log(favorite, '좋아요')
 
     return {
@@ -272,6 +275,7 @@ export class BoardsService {
         const refundAlert = this.alertRepository.create({
           user: prevUser,
           vehicle: auction.vehicle,
+          auction,
           message: refundBid.type,
         })
         await this.alertRepository.save(refundAlert);
@@ -291,6 +295,7 @@ export class BoardsService {
     const bidAlert = this.alertRepository.create({
       user,
       vehicle: auction.vehicle,
+      auction,
       message: newBid.type
     })
     await this.alertRepository.save(bidAlert);

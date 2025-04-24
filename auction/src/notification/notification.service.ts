@@ -273,6 +273,7 @@ export class NotificationService {
                 const alert = this.alertRepository.create({
                     user: lastBid.user,
                     vehicle: auction.vehicle,
+                    auction,
                     message: 'auc-end'
                 });
                 await this.alertRepository.save(alert);
