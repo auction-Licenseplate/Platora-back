@@ -216,8 +216,8 @@ export class BoardsService {
       .andWhere('fav.status = true')
       .getOne();
   
-    console.log(typeof auctionId, auctionId, '경매아이디타입'); 
-    console.log(typeof userId, userId, '유저아이디타입');    
+    // console.log(typeof auctionId, auctionId, '경매아이디타입'); 
+    // console.log(typeof userId, userId, '유저아이디타입');    
     console.log(favorite, '좋아요')
 
     return {
@@ -323,8 +323,8 @@ export class BoardsService {
 
     const existingFavorite = await this.favoriteRepository
       .createQueryBuilder('fav')
-      .leftJoin('fav.user', 'user')
-      .leftJoin('fav.auction', 'auction')
+      .leftJoinAndSelect('fav.user', 'user')
+      .leftJoinAndSelect('fav.auction', 'auction')
       .where('user.id = :userId', { userId: numUserId })
       .andWhere('auction.id = :auctionId', { auctionId })
       .getOne();
