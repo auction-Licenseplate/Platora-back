@@ -101,7 +101,6 @@ export class BoardsController {
   }
 
   // 좋아요 업데이트
-  @UseGuards(JwtAuthGuard)
   @Post('/likepost')
   @ApiOperation({ summary: '좋아요 등록/취소' })
   @ApiResponse({ status: 200, schema: {example: {message: '좋아요 등록 완료', status: true }}})

@@ -159,6 +159,7 @@ export class BoardsService {
         'auction.status AS status', // 경매 상태
         'auction.id AS auctionID', // 경매 PK
         'vehicle.car_img AS carImage', // 차량 이미지
+        ':userId AS currentUserId', // 현재 사용자ID
       ])
       .where('favUser.id = :userId', { userId }) // 해당 유저의 데이터만
       .andWhere('favorite.status = true') // status 일치 조건만
