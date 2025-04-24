@@ -101,14 +101,15 @@ export class BoardsController {
   }
 
   // 좋아요 업데이트
+  @UseGuards(JwtAuthGuard)
   @Post('/likepost')
   @ApiOperation({ summary: '좋아요 등록/취소' })
   @ApiResponse({ status: 200, schema: {example: {message: '좋아요 등록 완료', status: true }}})
-  async postLike(@Body() body: LikePostRequestDto){
-    console.log(body.id, '좋아요 업데이트 할 경매번호')
+  async postLike(@Req() req, @Body() body: LikePostRequestDto){
     console.log('like 요청 body:', body);
+    const currentUser = req.user;
     const { id, userId } = body;
-    return await this.boardService.updateLike(id, userId);
+    return await this.boardService.updateLike(id, userId, currentUser);
   }
 
   // 대시보드 정보 전달

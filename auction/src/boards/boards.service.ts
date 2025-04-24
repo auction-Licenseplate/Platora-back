@@ -305,17 +305,14 @@ export class BoardsService {
   }
 
   // 좋아요 업데이트
-  async updateLike(id: string, userId: string){
+  async updateLike(id: string, userId: string, currentUser: string){
     const numUserId = Number(userId); // 타입 맞춰서 진행해야함
     const numAuctionId = Number(id);
-    console.log(numAuctionId, '서비스에서 타입변환한 경매번호')
-    if (isNaN(numAuctionId)) {
-      throw new BadRequestException('잘못된 요청: 숫자 변환 실패');
-    }
+    const numCurrentUserId = Number(currentUser);
+
 
     const user = await this.userRepository.findOne({ where: { id: numUserId } });
     const auction = await this.auctionRepository.findOne({ where: { id: numAuctionId } });
-    console.log(auction, '서비스코드 - 일치하는 경매')
 
     if (!user || !auction) {
       return { message: '유저랑 경매 정보 없음' };
@@ -328,16 +325,15 @@ export class BoardsService {
       },
     });
 
-    // const existingFavorite = await this.favoriteRepository
-    //   .createQueryBuilder('fav')
-    //   .leftJoinAndSelect('fav.user', 'user')
-    //   .leftJoinAndSelect('fav.auction', 'auction')
-    //   .where('user.id = :userId', { userId: numUserId })
-    //   .andWhere('auction.id = :auctionId', { auctionId: numAuctionId })
-    //   .getOne();
+    const existingFavorite2 = await this.favoriteRepository.findOne({
+      where: {
+        user: {id: numCurrentUserId},
+        auction: {id: numAuctionId},
+      }
+    });
 
       console.log('경매타입변경확인', typeof id);
-      console.log('찾은 favorite:', existingFavorite);
+      console.log('찾은 favorite:', existingFavorite2);
 
     if (existingFavorite) { // 토글 진행
       existingFavorite.status = !existingFavorite.status;
@@ -349,12 +345,28 @@ export class BoardsService {
       };
     }
 
+    if (existingFavorite2) {
+      existingFavorite2.status = !existingFavorite2.status;
+      await this.favoriteRepository.save(existingFavorite2);
+      return {
+        message: existingFavorite2.status ? '좋아요 등록 완료' : '좋아요 취소 완료',
+        status: existingFavorite2.status,
+      }
+    }
+
     const favorite = this.favoriteRepository.create({
       user: { id: numUserId },
       auction: { id: numAuctionId },
       status: true,
     });
     await this.favoriteRepository.save(favorite);
+    
+    const favorite2 = this.favoriteRepository.create({
+      user: { id: numCurrentUserId },
+      auction: { id: numAuctionId },
+      status: true,
+    })
+    await this.favoriteRepository.save(favorite2);
 
     return { message: '좋아요 등록 완료', status: true };
   }
