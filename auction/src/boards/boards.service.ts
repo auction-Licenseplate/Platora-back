@@ -305,9 +305,9 @@ export class BoardsService {
   }
 
   // 좋아요 업데이트
-  async updateLike(auctionId: string, userId: string){
+  async updateLike(id: string, userId: string){
     const numUserId = Number(userId); // 타입 맞춰서 진행해야함
-    const numAuctionId = Number(auctionId);
+    const numAuctionId = Number(id);
     console.log(numAuctionId, '서비스에서 타입변환한 경매번호')
 
     const user = await this.userRepository.findOne({ where: { id: numUserId } });
@@ -333,7 +333,7 @@ export class BoardsService {
       .andWhere('auction.id = :auctionId', { auctionId: numAuctionId })
       .getOne();
 
-      console.log('경매타입변경확인', typeof auctionId);
+      console.log('경매타입변경확인', typeof id);
       console.log('찾은 favorite:', existingFavorite);
 
     if (existingFavorite) { // 토글 진행
