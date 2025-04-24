@@ -166,7 +166,7 @@ export class BoardsService {
   }
 
   // 상세페이지 전달
-  async getDetailInfo(auctionId: string, userId: string) {
+  async getDetailInfo(id: string, userId: string) {
     const result = await this.auctionRepository
       .createQueryBuilder('au')
       .innerJoin('au.user', 'registerUser') // 등록한 사람
@@ -174,7 +174,7 @@ export class BoardsService {
       .innerJoin('au.bids', 'bid')
       .innerJoin('bid.user', 'bidUser') // 입찰한 사람
       .innerJoin('au.grade', 'grade')
-      .where('au.id = :auctionId', { auctionId })
+      .where('au.id = :auctionId', { id })
       .select([
         'au.final_price',
         'au.end_time',
@@ -196,7 +196,7 @@ export class BoardsService {
     const lastBid = await this.bidRepository
       .createQueryBuilder('bid')
       .innerJoin('bid.user', 'user') // 입찰버튼 누른 사람
-      .where('bid.auction = :auctionId', { auctionId })
+      .where('bid.auction = :auctionId', { id })
       .orderBy('bid.create_at', 'DESC') // 가장 최근
       .select([
         'user.id AS bidUser_Id', // 입찰자 id (PK)
@@ -211,14 +211,14 @@ export class BoardsService {
 
     const favorite = await this.favoriteRepository
       .createQueryBuilder('fav')
-      .where('fav.auction = :auctionId', { auctionId: Number(auctionId) })
+      .where('fav.auction = :auctionId', { auctionId: Number(id) })
       .andWhere('fav.user = :userId', { userId: Number(userId) })
       .andWhere('fav.status = true')
       .getOne();
   
     // console.log(typeof auctionId, auctionId, '경매아이디타입'); 
     // console.log(typeof userId, userId, '유저아이디타입');    
-    console.log('auctionId:', auctionId, typeof auctionId);
+    console.log('auctionId:', id, typeof id);
     console.log(favorite, '좋아요')
 
     return {
